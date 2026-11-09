@@ -1,0 +1,12 @@
+.text { font-size: 0.88rem; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; }
+.import {
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 5px 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+.import:focus-within { outline: 2px solid var(--accent); outline-offset: 2px; }
+.error { font-size: 0.88rem; color: var(--danger); }

@@ -1,0 +1,15 @@
+.row { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.small { font-size: 0.88rem; }
+.meta { font-size: 0.82rem; color: var(--muted); }
+.finding {
+  border-left: 4px solid var(--line);
+  padding: 6px 0 6px 12px;
+  display: grid;
+  gap: 4px;
+}
+.high { border-color: var(--danger); }
+.medium { border-color: var(--warn); }
+.low { border-color: var(--accent); }
+.info { border-color: var(--line); }
+.done { opacity: 0.55; }
+.prompt { font-size: 0.8rem; }

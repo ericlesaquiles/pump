@@ -1,0 +1,35 @@
+.timer {
+  position: fixed;
+  left: 50%;
+  transform: translateX(-50%);
+  bottom: calc(16px + env(safe-area-inset-bottom, 0px));
+  z-index: 30;
+  display: flex;
+  gap: 10px;
+  align-items: center;
+  background: var(--ink);
+  color: var(--bg);
+  padding: 8px 10px 8px 16px;
+  border-radius: 999px;
+  box-shadow: var(--shadow);
+}
+.done { background: var(--good); }
+.label { font-size: 0.85rem; font-weight: 600; }
+.time {
+  font-family: var(--f-display);
+  font-size: 1.4rem;
+  font-weight: 700;
+  min-width: 3.2ch;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+}
+.btn {
+  background: transparent;
+  color: inherit;
+  border: 1px solid currentColor;
+  border-radius: var(--r-sm);
+  padding: 4px 10px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  opacity: 0.9;
+}

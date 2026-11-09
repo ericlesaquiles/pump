@@ -1,0 +1,7 @@
+.spark { width: 100%; height: auto; display: block; }
+.line { fill: none; stroke: var(--accent); stroke-width: 2; }
+.area { fill: var(--accent); opacity: 0.12; }
+.dot { fill: var(--accent); }
+.grid { stroke: var(--line); }
+.label { fill: var(--muted); font-size: 11px; font-variant-numeric: tabular-nums; }
+.single { font-size: 0.88rem; font-variant-numeric: tabular-nums; }

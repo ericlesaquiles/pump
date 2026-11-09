@@ -1,0 +1,7 @@
+.form { display: grid; gap: 16px; max-width: 760px; }
+.check { display: flex; gap: 8px; align-items: center; }
+.field { display: grid; gap: 4px; font-size: 0.9rem; }
+.foot { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+.text { font-size: 0.9rem; }
+.ok { font-size: 0.88rem; color: var(--good); }
+.error { font-size: 0.88rem; color: var(--danger); }

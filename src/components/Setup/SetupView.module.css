@@ -1,0 +1,6 @@
+.form { display: grid; gap: 16px; max-width: 760px; }
+.row { display: flex; gap: 8px; flex-wrap: wrap; }
+.summary { font-size: 0.85rem; cursor: pointer; width: max-content; }
+.inner { display: grid; gap: 8px; margin-top: 8px; }
+.age { max-width: 120px; }
+.foot { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }

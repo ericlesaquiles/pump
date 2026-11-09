@@ -1,0 +1,46 @@
+.bar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  background: var(--surface);
+  border-bottom: 1px solid var(--line);
+  padding: calc(8px + env(safe-area-inset-top, 0px)) var(--gutter-r) 8px var(--gutter);
+}
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  text-decoration: none;
+  color: var(--ink);
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 1.4rem;
+  text-transform: uppercase;
+}
+.brand svg { fill: var(--ink); }
+.tabs { display: flex; gap: 4px; flex-wrap: wrap; }
+.tabs a {
+  text-decoration: none;
+  color: var(--muted);
+  font-weight: 600;
+  padding: 6px 10px;
+  border-radius: var(--r-sm);
+}
+.tabs a[aria-current="page"] {
+  color: var(--ink);
+  background: var(--sunken);
+  box-shadow: inset 0 0 0 1px var(--line);
+}
+.offline {
+  margin-left: auto;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--warn);
+  background: var(--warn-bg);
+  padding: 3px 8px;
+  border-radius: 999px;
+}

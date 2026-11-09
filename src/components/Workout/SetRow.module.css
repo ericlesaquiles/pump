@@ -1,0 +1,36 @@
+.row {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr) minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: center;
+}
+.n { font-family: var(--f-display); font-weight: 700; color: var(--muted); }
+.inp { position: relative; }
+.inp input {
+  padding-right: 40px;
+  font-weight: 600;
+  font-variant-numeric: tabular-nums;
+}
+.inp input::placeholder { color: var(--muted); opacity: 0.55; font-weight: 500; }
+.inp span {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  font-size: 0.75rem;
+  color: var(--muted);
+  pointer-events: none;
+}
+.inp input.hit { border-color: var(--good); }
+.hurt {
+  display: inline-flex;
+  gap: 4px;
+  align-items: center;
+  font-size: 0.78rem;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+@media (max-width: 560px) {
+  .row { grid-template-columns: 24px minmax(0, 1fr) minmax(0, 1fr) auto; gap: 6px; }
+}

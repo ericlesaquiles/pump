@@ -1,0 +1,20 @@
+.dialog {
+  border: 1px solid var(--line);
+  border-radius: 14px;
+  padding: 0;
+  background: var(--surface);
+  color: var(--ink);
+  width: min(640px, calc(100vw - 32px));
+  max-height: calc(100vh - 48px);
+}
+.dialog::backdrop { background: var(--backdrop); }
+.body { display: grid; gap: 14px; padding: 18px; }
+.head { display: flex; justify-content: space-between; gap: 12px; align-items: start; }
+.eyebrow {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  font-weight: 600;
+}
+.foot { display: flex; gap: 8px; justify-content: flex-end; flex-wrap: wrap; }

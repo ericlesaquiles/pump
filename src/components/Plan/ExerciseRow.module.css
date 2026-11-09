@@ -1,0 +1,14 @@
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 4px 12px;
+  padding: 10px 16px;
+  border-top: 1px solid var(--line);
+  align-items: start;
+}
+.row:first-child { border-top: 0; }
+.name { font-weight: 600; }
+.rx { color: var(--muted); font-size: 0.88rem; font-variant-numeric: tabular-nums; }
+.why { grid-column: 1 / -1; font-size: 0.86rem; color: var(--muted); }
+.why summary { cursor: pointer; width: max-content; }
+.why ul { margin: 4px 0 0; padding-left: 18px; }

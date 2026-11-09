@@ -1,0 +1,21 @@
+.field { display: grid; gap: 4px; font-size: 0.88rem; }
+.label {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+  font-weight: 600;
+}
+.notes { display: grid; gap: 6px; }
+.savebar {
+  position: sticky;
+  bottom: 0;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+  padding-block: 12px calc(12px + env(safe-area-inset-bottom, 0px));
+  background: linear-gradient(to top, var(--bg) 70%, transparent);
+}
+.status { font-size: 0.88rem; color: var(--muted); }
+.error { font-size: 0.88rem; color: var(--danger); }

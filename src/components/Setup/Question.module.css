@@ -1,0 +1,17 @@
+.q {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: var(--r);
+  padding: 16px;
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  min-width: 0;
+}
+.legend {
+  font-family: var(--f-display);
+  font-weight: 700;
+  font-size: 1.15rem;
+  padding: 0 4px;
+}
+.hint { color: var(--muted); font-size: 0.88rem; }

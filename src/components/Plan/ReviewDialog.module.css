@@ -1,0 +1,15 @@
+.text { font-size: 0.9rem; }
+.preview {
+  max-height: 260px;
+  overflow: auto;
+  background: var(--sunken);
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  padding: 10px;
+  font-size: 0.78rem;
+  white-space: pre-wrap;
+  word-break: break-word;
+  margin: 0;
+}
+.status { font-size: 0.88rem; color: var(--muted); }
+.error { font-size: 0.88rem; color: var(--danger); }

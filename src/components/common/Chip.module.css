@@ -1,0 +1,14 @@
+.chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+.good { background: var(--good-bg); color: var(--good); }
+.warn { background: var(--warn-bg); color: var(--warn); }
+.danger { background: var(--danger-bg); color: var(--danger); }
+.quiet { background: var(--sunken); color: var(--muted); border: 1px solid var(--line); }

@@ -1,0 +1,59 @@
+/* Design tokens. Pump looks like a gym log sheet; training days are coded by bumper-plate colour. */
+:root {
+  --bg: #eef1f4;
+  --surface: #ffffff;
+  --sunken: #f5f7f9;
+  --ink: #15202b;
+  --muted: #5a6775;
+  --line: #d8dee5;
+  --accent: #2550c9;
+  --accent-ink: #ffffff;
+  --good: #23864a;
+  --good-bg: #e3f4ea;
+  --warn: #8a5f00;
+  --warn-bg: #fbf1d6;
+  --danger: #c12f28;
+  --danger-bg: #fbe7e5;
+  --on-danger: #ffffff;
+  --backdrop: rgb(10 15 20 / 0.5);
+  --shadow: 0 6px 24px rgb(0 0 0 / 0.25);
+
+  /* Bumper plates */
+  --p-red: #d3342c;
+  --p-blue: #2a5bd7;
+  --p-yellow: #e2a80c;
+  --p-green: #2f9e55;
+  --p-grey: #8794a2;
+
+  --f-display: "Barlow Condensed", "Roboto Condensed", "Arial Narrow", "Helvetica Neue", sans-serif;
+  --f-body: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+
+  --r: 10px;
+  --r-sm: 8px;
+  --gutter: max(16px, env(safe-area-inset-left, 0px));
+  --gutter-r: max(16px, env(safe-area-inset-right, 0px));
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #0e1319;
+    --surface: #161d25;
+    --sunken: #11171e;
+    --ink: #e5eaef;
+    --muted: #93a0ae;
+    --line: #27313c;
+    --accent: #7096ff;
+    --accent-ink: #0b1220;
+    --good: #5acb85;
+    --good-bg: #16301f;
+    --warn: #f0c04a;
+    --warn-bg: #33280c;
+    --danger: #ff6a62;
+    --danger-bg: #3a1614;
+    --on-danger: #1a0605;
+    --p-grey: #b5c0cc;
+    color-scheme: dark;
+  }
+}
