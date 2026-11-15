@@ -1,3 +1,4 @@
+import { useI18n } from "../../hooks/useI18n.ts";
 import { dayLetter } from "../../lib/rotation.ts";
 import type { PlanDay } from "../../lib/types.ts";
 import { Button } from "../common/Button.tsx";
@@ -17,6 +18,7 @@ interface Props {
 }
 
 export function DayCard({ day, dayIdx, isNext, onStart, onInfo, onSwap }: Props) {
+  const { t } = useI18n();
   const headingId = `day-${dayIdx}`;
   const active = day.exercises.map((item, exIdx) => ({ item, exIdx })).filter(({ item }) => item.sets > 0);
   return (
@@ -25,11 +27,14 @@ export function DayCard({ day, dayIdx, isNext, onStart, onInfo, onSwap }: Props)
         <div className={styles.title}>
           <Plate day={day.key} />
           <div>
-            <h2 id={headingId}>Workout {dayLetter(dayIdx)} · {day.name}</h2>
-            <div className={styles.meta}>{day.focus} · about {day.estMinutes} min{isNext && <> · <Chip tone="good">next</Chip></>}</div>
+            <h2 id={headingId}>{t.workoutFull(dayIdx, day.key)}</h2>
+            <div className={styles.meta}>
+              {t.plan.about(t.days[day.key].focus, day.estMinutes)}
+              {isNext && <> · <Chip tone="good">{t.plan.next}</Chip></>}
+            </div>
           </div>
         </div>
-        <Button small onClick={onStart}>Start workout</Button>
+        <Button small onClick={onStart}>{t.plan.startWorkout(dayLetter(dayIdx))}</Button>
       </div>
       {active.length ? (
         <ul className={styles.list}>
@@ -38,7 +43,7 @@ export function DayCard({ day, dayIdx, isNext, onStart, onInfo, onSwap }: Props)
           ))}
         </ul>
       ) : (
-        <p className={styles.empty}>No exercises fit your equipment and limits for this day.</p>
+        <p className={styles.empty}>{t.plan.emptyDay}</p>
       )}
     </section>
   );

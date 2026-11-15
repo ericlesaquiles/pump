@@ -1,0 +1,384 @@
+{
+ "Barbell_Bench_Press_-_Medium_Grip": {
+  "name": "Supino reto com barra"
+ },
+ "Dumbbell_Bench_Press": {
+  "name": "Supino reto com halteres"
+ },
+ "Dumbbell_Bench_Press_with_Neutral_Grip": {
+  "name": "Supino com halteres, pegada neutra"
+ },
+ "Machine_Bench_Press": {
+  "name": "Supino na máquina"
+ },
+ "Smith_Machine_Bench_Press": {
+  "name": "Supino reto no Smith"
+ },
+ "Pushups": {
+  "name": "Flexão de braço"
+ },
+ "Push-Ups_With_Feet_Elevated": {
+  "name": "Flexão com pés elevados"
+ },
+ "Bench_Press_-_With_Bands": {
+  "name": "Supino com elástico"
+ },
+ "Dips_-_Chest_Version": {
+  "name": "Mergulho nas paralelas (peito)"
+ },
+ "Close-Grip_Barbell_Bench_Press": {
+  "name": "Supino fechado"
+ },
+ "Barbell_Incline_Bench_Press_-_Medium_Grip": {
+  "name": "Supino inclinado com barra"
+ },
+ "Incline_Dumbbell_Press": {
+  "name": "Supino inclinado com halteres"
+ },
+ "Incline_Dumbbell_Bench_With_Palms_Facing_In": {
+  "name": "Supino inclinado com halteres, pegada neutra"
+ },
+ "Leverage_Incline_Chest_Press": {
+  "name": "Supino inclinado na máquina"
+ },
+ "Smith_Machine_Incline_Bench_Press": {
+  "name": "Supino inclinado no Smith"
+ },
+ "Incline_Cable_Chest_Press": {
+  "name": "Supino inclinado na polia"
+ },
+ "Incline_Push-Up": {
+  "name": "Flexão inclinada (mãos no banco)",
+  "note": "Mais fácil que a flexão no chão; apesar do nome, trabalha mais a parte de baixo do peito."
+ },
+ "Standing_Military_Press": {
+  "name": "Desenvolvimento em pé com barra"
+ },
+ "Seated_Barbell_Military_Press": {
+  "name": "Desenvolvimento sentado com barra"
+ },
+ "Dumbbell_Shoulder_Press": {
+  "name": "Desenvolvimento sentado com halteres"
+ },
+ "Arnold_Dumbbell_Press": {
+  "name": "Desenvolvimento Arnold"
+ },
+ "Machine_Shoulder_Military_Press": {
+  "name": "Desenvolvimento na máquina"
+ },
+ "Shoulder_Press_-_With_Bands": {
+  "name": "Desenvolvimento com elástico"
+ },
+ "Two-Arm_Kettlebell_Military_Press": {
+  "name": "Desenvolvimento com kettlebells"
+ },
+ "Cable_Crossover": {
+  "name": "Crucifixo na polia (crossover)"
+ },
+ "Low_Cable_Crossover": {
+  "name": "Crossover de baixo para cima"
+ },
+ "Butterfly": {
+  "name": "Voador (peck deck)"
+ },
+ "Dumbbell_Flyes": {
+  "name": "Crucifixo com halteres"
+ },
+ "Incline_Cable_Flye": {
+  "name": "Crucifixo inclinado na polia"
+ },
+ "Triceps_Pushdown": {
+  "name": "Tríceps na polia"
+ },
+ "Triceps_Pushdown_-_Rope_Attachment": {
+  "name": "Tríceps corda"
+ },
+ "Cable_Rope_Overhead_Triceps_Extension": {
+  "name": "Tríceps francês na polia"
+ },
+ "Standing_Dumbbell_Triceps_Extension": {
+  "name": "Tríceps francês com halter"
+ },
+ "EZ-Bar_Skullcrusher": {
+  "name": "Tríceps testa com barra W"
+ },
+ "Tricep_Dumbbell_Kickback": {
+  "name": "Tríceps coice com halter"
+ },
+ "Machine_Triceps_Extension": {
+  "name": "Tríceps na máquina"
+ },
+ "Band_Skull_Crusher": {
+  "name": "Tríceps com elástico"
+ },
+ "Dips_-_Triceps_Version": {
+  "name": "Mergulho nas paralelas (tríceps)"
+ },
+ "Bench_Dips": {
+  "name": "Mergulho no banco"
+ },
+ "Bent_Over_Barbell_Row": {
+  "name": "Remada curvada com barra"
+ },
+ "Seated_Cable_Rows": {
+  "name": "Remada baixa sentada"
+ },
+ "One-Arm_Dumbbell_Row": {
+  "name": "Remada unilateral com halter (serrote)"
+ },
+ "Dumbbell_Incline_Row": {
+  "name": "Remada com halteres apoiada no banco inclinado"
+ },
+ "Leverage_Iso_Row": {
+  "name": "Remada na máquina"
+ },
+ "T-Bar_Row_with_Handle": {
+  "name": "Remada cavalinho (barra T)"
+ },
+ "Bent_Over_Two-Dumbbell_Row": {
+  "name": "Remada curvada com halteres"
+ },
+ "Inverted_Row": {
+  "name": "Remada invertida",
+  "note": "Use uma barra presa no rack ou a borda de uma mesa firme."
+ },
+ "Two-Arm_Kettlebell_Row": {
+  "name": "Remada com kettlebells"
+ },
+ "Wide-Grip_Lat_Pulldown": {
+  "name": "Puxada frontal aberta"
+ },
+ "Close-Grip_Front_Lat_Pulldown": {
+  "name": "Puxada frontal fechada"
+ },
+ "Underhand_Cable_Pulldowns": {
+  "name": "Puxada supinada"
+ },
+ "Pullups": {
+  "name": "Barra fixa"
+ },
+ "Chin-Up": {
+  "name": "Barra fixa supinada"
+ },
+ "Band_Assisted_Pull-Up": {
+  "name": "Barra fixa com elástico"
+ },
+ "One_Arm_Lat_Pulldown": {
+  "name": "Puxada unilateral"
+ },
+ "Straight-Arm_Pulldown": {
+  "name": "Pulldown com braços estendidos"
+ },
+ "Face_Pull": {
+  "name": "Face pull"
+ },
+ "Reverse_Machine_Flyes": {
+  "name": "Voador invertido"
+ },
+ "Cable_Rear_Delt_Fly": {
+  "name": "Crucifixo inverso na polia"
+ },
+ "Reverse_Flyes": {
+  "name": "Crucifixo inverso curvado com halteres"
+ },
+ "Seated_Bent-Over_Rear_Delt_Raise": {
+  "name": "Elevação posterior sentado"
+ },
+ "Back_Flyes_-_With_Bands": {
+  "name": "Crucifixo inverso com elástico"
+ },
+ "Side_Lateral_Raise": {
+  "name": "Elevação lateral com halteres"
+ },
+ "Cable_Seated_Lateral_Raise": {
+  "name": "Elevação lateral na polia"
+ },
+ "One-Arm_Side_Laterals": {
+  "name": "Elevação lateral unilateral"
+ },
+ "Lateral_Raise_-_With_Bands": {
+  "name": "Elevação lateral com elástico"
+ },
+ "Barbell_Curl": {
+  "name": "Rosca direta com barra"
+ },
+ "EZ-Bar_Curl": {
+  "name": "Rosca direta com barra W"
+ },
+ "Dumbbell_Bicep_Curl": {
+  "name": "Rosca com halteres"
+ },
+ "Hammer_Curls": {
+  "name": "Rosca martelo"
+ },
+ "Incline_Dumbbell_Curl": {
+  "name": "Rosca inclinada com halteres"
+ },
+ "Standing_Biceps_Cable_Curl": {
+  "name": "Rosca na polia"
+ },
+ "Cable_Hammer_Curls_-_Rope_Attachment": {
+  "name": "Rosca martelo na polia com corda"
+ },
+ "Preacher_Curl": {
+  "name": "Rosca Scott"
+ },
+ "Machine_Preacher_Curls": {
+  "name": "Rosca Scott na máquina"
+ },
+ "Close-Grip_EZ-Bar_Curl_with_Band": {
+  "name": "Rosca com elástico"
+ },
+ "Barbell_Squat": {
+  "name": "Agachamento livre com barra"
+ },
+ "Front_Barbell_Squat": {
+  "name": "Agachamento frontal"
+ },
+ "Box_Squat": {
+  "name": "Agachamento no banco (box squat)"
+ },
+ "Leg_Press": {
+  "name": "Leg press"
+ },
+ "Hack_Squat": {
+  "name": "Agachamento hack"
+ },
+ "Smith_Machine_Squat": {
+  "name": "Agachamento no Smith"
+ },
+ "Goblet_Squat": {
+  "name": "Agachamento goblet"
+ },
+ "Dumbbell_Squat": {
+  "name": "Agachamento com halteres"
+ },
+ "Bodyweight_Squat": {
+  "name": "Agachamento sem peso"
+ },
+ "Squats_-_With_Bands": {
+  "name": "Agachamento com elástico"
+ },
+ "Split_Squat_with_Dumbbells": {
+  "name": "Afundo estático com halteres",
+  "note": "Com o pé de trás apoiado num banco, vira agachamento búlgaro."
+ },
+ "Dumbbell_Rear_Lunge": {
+  "name": "Afundo reverso com halteres"
+ },
+ "Dumbbell_Lunges": {
+  "name": "Avanço com halteres"
+ },
+ "Barbell_Lunge": {
+  "name": "Avanço com barra"
+ },
+ "Smith_Single-Leg_Split_Squat": {
+  "name": "Afundo no Smith"
+ },
+ "Bodyweight_Walking_Lunge": {
+  "name": "Avanço caminhando"
+ },
+ "Romanian_Deadlift": {
+  "name": "Levantamento terra romeno (stiff)"
+ },
+ "Stiff-Legged_Dumbbell_Deadlift": {
+  "name": "Stiff com halteres"
+ },
+ "Barbell_Deadlift": {
+  "name": "Levantamento terra"
+ },
+ "Good_Morning": {
+  "name": "Bom-dia (good morning)"
+ },
+ "Smith_Machine_Stiff-Legged_Deadlift": {
+  "name": "Stiff no Smith"
+ },
+ "Kettlebell_One-Legged_Deadlift": {
+  "name": "Stiff unilateral"
+ },
+ "Hyperextensions_Back_Extensions": {
+  "name": "Extensão lombar (hiperextensão)"
+ },
+ "Band_Good_Morning": {
+  "name": "Bom-dia com elástico"
+ },
+ "Barbell_Hip_Thrust": {
+  "name": "Elevação pélvica com barra"
+ },
+ "Barbell_Glute_Bridge": {
+  "name": "Ponte de glúteo com barra"
+ },
+ "Single_Leg_Glute_Bridge": {
+  "name": "Ponte de glúteo unilateral"
+ },
+ "One-Legged_Cable_Kickback": {
+  "name": "Coice de glúteo na polia"
+ },
+ "Hip_Extension_with_Bands": {
+  "name": "Extensão de quadril com elástico"
+ },
+ "Leg_Extensions": {
+  "name": "Cadeira extensora"
+ },
+ "Single-Leg_Leg_Extension": {
+  "name": "Cadeira extensora unilateral"
+ },
+ "Lying_Leg_Curls": {
+  "name": "Mesa flexora"
+ },
+ "Seated_Leg_Curl": {
+  "name": "Cadeira flexora"
+ },
+ "Standing_Leg_Curl": {
+  "name": "Flexora em pé"
+ },
+ "Seated_Band_Hamstring_Curl": {
+  "name": "Flexão de joelhos com elástico"
+ },
+ "Standing_Calf_Raises": {
+  "name": "Panturrilha em pé"
+ },
+ "Seated_Calf_Raise": {
+  "name": "Panturrilha sentado"
+ },
+ "Calf_Press_On_The_Leg_Press_Machine": {
+  "name": "Panturrilha no leg press"
+ },
+ "Smith_Machine_Calf_Raise": {
+  "name": "Panturrilha no Smith"
+ },
+ "Standing_Dumbbell_Calf_Raise": {
+  "name": "Panturrilha com halteres"
+ },
+ "Calf_Raises_-_With_Bands": {
+  "name": "Panturrilha com elástico"
+ },
+ "Cable_Crunch": {
+  "name": "Abdominal na polia"
+ },
+ "Hanging_Leg_Raise": {
+  "name": "Elevação de pernas na barra"
+ },
+ "Ab_Crunch_Machine": {
+  "name": "Abdominal na máquina"
+ },
+ "Pallof_Press": {
+  "name": "Pallof press (antirrotação)"
+ },
+ "Plank": {
+  "name": "Prancha",
+  "note": "Anote os segundos de prancha no campo de repetições."
+ },
+ "Crunches": {
+  "name": "Abdominal supra"
+ },
+ "Reverse_Crunch": {
+  "name": "Abdominal infra"
+ },
+ "Flat_Bench_Lying_Leg_Raise": {
+  "name": "Elevação de pernas deitado"
+ },
+ "Barbell_Ab_Rollout": {
+  "name": "Rollout com barra"
+ }
+}

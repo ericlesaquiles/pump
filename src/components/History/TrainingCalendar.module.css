@@ -4,8 +4,8 @@
   justify-content: space-between;
   gap: 8px;
 }
-.title { display: grid; justify-items: center; text-transform: capitalize; }
-.muted { color: var(--muted); font-size: 0.82rem; text-transform: none; }
+.title { display: grid; justify-items: center; }
+.muted { color: var(--muted); font-size: 0.82rem; }
 .cal {
   width: 100%;
   border-collapse: separate;

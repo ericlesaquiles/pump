@@ -27,8 +27,8 @@ test("every full-gym scenario builds the right split within the time budget", ()
     assert.equal(plan.days.length, a.days);
     assert.deepEqual(plan.days.map((d) => d.key), SPLITS[a.days!]!.days);
     for (const d of plan.days) {
-      assert.ok(d.exercises.some((s) => s.sets > 0), `${d.name} empty for ${JSON.stringify(a)}`);
-      assert.ok(d.estMinutes <= a.minutes! + 1, `${d.name} ${d.estMinutes} min > ${a.minutes} for ${JSON.stringify(a)}`);
+      assert.ok(d.exercises.some((s) => s.sets > 0), `${d.key} empty for ${JSON.stringify(a)}`);
+      assert.ok(d.estMinutes <= a.minutes! + 1, `${d.key} ${d.estMinutes} min > ${a.minutes} for ${JSON.stringify(a)}`);
       const ids = d.exercises.map((s) => s.exId);
       assert.equal(new Set(ids).size, ids.length, "no exercise twice in one day");
     }
@@ -64,7 +64,7 @@ test("avoided and injured joints and painful movements are excluded", () => {
     assert.ok(!ex.joints.lower_back, `${ex.name} loads the lower back`);
     assert.ok(!ex.moves.includes("overhead"), `${ex.name} is overhead`);
   }
-  assert.ok(plan.notices.some((n) => n.includes("lower back")), "injured joint gets a notice");
+  assert.ok(plan.notices.some((n) => typeof n !== "string" && n.k === "notice.injured" && n.joint === "lower_back"), "injured joint gets a notice");
 });
 
 test("mild limitations raise reps on stressful exercises", () => {
@@ -93,7 +93,7 @@ test("beginners never get advanced exercises", () => {
 
 test("bodyweight-only plans don't crash and explain empty days", () => {
   const plan = gen({ days: 6, minutes: 60, equipment: [] });
-  assert.ok(plan.notices.some((n) => n.includes("Pull days")));
+  assert.ok(plan.notices.some((n) => typeof n !== "string" && n.k === "notice.dayEmpty" && n.key === "pull"));
 });
 
 test("dislikes are never used", () => {
@@ -155,7 +155,7 @@ test("progression cue: add weight only when every set hits the top of the range"
   ];
   const h = historyFor(sessions, "Barbell_Squat");
   assert.equal(cue(h, { sets: 3, reps: [5, 8] }, "squat", "kg").kind, "add");
-  assert.equal(cue(h, { sets: 3, reps: [5, 8] }, "squat", "kg").text, "Add 5 kg");
+  assert.deepEqual(cue(h, { sets: 3, reps: [5, 8] }, "squat", "kg"), { kind: "add", step: 5, unit: "kg" });
   sessions[0]!.entries[0]!.sets[2]!.r = 7;
   assert.equal(cue(historyFor(sessions, "Barbell_Squat"), { sets: 3, reps: [5, 8] }, "squat", "kg").kind, "hold");
   assert.equal(cue([], { sets: 3, reps: [5, 8] }, "squat", "kg").kind, "first");

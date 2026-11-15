@@ -1,10 +1,11 @@
 import { useState, type ChangeEvent } from "react";
 import { useAppState } from "../../hooks/useAppState.tsx";
+import { useI18n } from "../../hooks/useI18n.ts";
 import { useToast } from "../../hooks/useToast.tsx";
 import { isoDate } from "../../lib/format.ts";
 import { shareBackup } from "../../lib/native.ts";
 import { isNative } from "../../lib/platform.ts";
-import { store } from "../../lib/storage.ts";
+import { NotABackupError, store } from "../../lib/storage.ts";
 import { Button } from "../common/Button.tsx";
 import { Panel } from "../common/Panel.tsx";
 import styles from "./BackupPanel.module.css";
@@ -12,6 +13,7 @@ import styles from "./BackupPanel.module.css";
 export function BackupPanel() {
   const { importBackup } = useAppState();
   const toast = useToast();
+  const { t } = useI18n();
   const [error, setError] = useState<string | null>(null);
 
   const exportBackup = async () => {
@@ -20,12 +22,12 @@ export function BackupPanel() {
     if (isNative) {
       // Android: save to the app's cache and open the share sheet (Drive, email, Files…).
       try {
-        await shareBackup(filename, json);
+        await shareBackup(filename, json, { title: t.history.shareTitle, dialogTitle: t.history.shareDialog });
         setError(null);
       } catch (err) {
         // Closing the share sheet without choosing anything also lands here; only report real failures.
         const msg = err instanceof Error ? err.message : "";
-        if (!/cancel/i.test(msg)) setError("Couldn't export the backup. Try again.");
+        if (!/cancel/i.test(msg)) setError(t.history.exportFailed);
       }
       return;
     }
@@ -45,19 +47,19 @@ export function BackupPanel() {
     try {
       importBackup(JSON.parse(await file.text()));
       setError(null);
-      toast("Backup imported");
+      toast(t.history.imported);
     } catch (err) {
-      setError(err instanceof SyntaxError ? "That file isn't valid JSON." : err instanceof Error ? err.message : "Couldn't import that file.");
+      setError(err instanceof SyntaxError ? t.history.badJson : err instanceof NotABackupError ? t.history.notBackup : t.history.importFailed);
     }
   };
 
   return (
-    <Panel label="Backup">
-      <p className={styles.text}>Your data lives only in this browser. Export a backup file now and then. API keys are not included.</p>
+    <Panel label={t.history.backup}>
+      <p className={styles.text}>{t.history.backupText}</p>
       <div className={styles.row}>
-        <Button variant="ghost" small onClick={() => void exportBackup()}>Export backup</Button>
+        <Button variant="ghost" small onClick={() => void exportBackup()}>{t.history.export}</Button>
         <label className={styles.import}>
-          Import backup
+          {t.history.import}
           <input type="file" accept="application/json,.json" onChange={onFile} hidden />
         </label>
       </div>

@@ -1,9 +1,10 @@
 // Optional AI review of a plan. Text only, opt-in, never applied automatically.
 // The Anthropic SDK is loaded lazily (its own chunk) only when a review is requested.
-import { MUSCLES, MUSCLE_KEYS, JOINTS, MOVEMENTS, GOALS, EXPERIENCE, PRIORITY_GROUPS } from "./constants.ts";
+import { MUSCLE_KEYS } from "./constants.ts";
 import { indexExercises } from "./generator.ts";
-import { dayLetter } from "./rotation.ts";
-import type { Exercise, Joint, Plan, ReviewFinding } from "./types.ts";
+import { DICTS } from "../i18n/index.ts";
+import { exerciseText } from "../i18n/exercises.ts";
+import type { Exercise, Joint, Lang, Plan, ReviewFinding, Severity } from "./types.ts";
 
 export const MODEL = "claude-opus-5-5";
 
@@ -64,42 +65,52 @@ export interface ReviewInput {
 
 export interface ReviewResult { summary: string; findings: ReviewFinding[]; model: string }
 
-/** The exact data that would be sent: answers + plan as plain text fields. */
-export function buildReviewInput(plan: Plan, exercises: Exercise[]): ReviewInput {
+/**
+ * The exact data that would be sent: answers + plan as plain text fields,
+ * with names and labels in the user's language.
+ */
+export function buildReviewInput(plan: Plan, exercises: Exercise[], lang: Lang = "en"): ReviewInput {
+  const t = DICTS[lang];
   const byId = indexExercises(exercises);
   const a = plan.answers;
+  const name = (id: string) => {
+    const ex = byId.get(id);
+    return ex ? exerciseText(ex, lang).name : id;
+  };
   return {
     person: {
-      goal: GOALS[a.goal],
-      experience: EXPERIENCE[a.experience],
+      goal: t.goals[a.goal],
+      experience: t.experience[a.experience],
       daysPerWeek: a.days,
       sessionMinutes: a.minutes,
-      equipment: a.equipment,
-      limitations: (Object.entries(a.injuries) as [Joint, string][]).map(([j, s]) => `${JOINTS[j]}: ${s}`),
-      painfulMovements: a.painful.map((m) => MOVEMENTS[m]),
-      priorities: a.priorities.map((p) => PRIORITY_GROUPS[p].label),
+      equipment: a.equipment.map((e) => t.equipment[e]),
+      limitations: (Object.entries(a.injuries) as [Joint, Severity][]).map(([j, s]) => `${t.joints[j]}: ${t.severity[s]}`),
+      painfulMovements: a.painful.map((m) => t.movements[m]),
+      priorities: a.priorities.map((p) => t.priorities[p]),
       ...(a.age ? { age: a.age } : {}),
     },
-    split: plan.splitName,
+    split: t.splits[a.days] ?? "",
     days: plan.days.map((d, i) => ({
-      day: `Workout ${dayLetter(i)} – ${d.name}`,
+      day: t.workoutFull(i, d.key),
       estimatedMinutes: d.estMinutes,
       exercises: d.exercises.filter((s) => s.sets > 0).map((s) => ({
-        name: byId.get(s.exId)?.name ?? s.exId,
+        name: name(s.exId),
         sets: s.sets,
         reps: `${s.reps[0]}–${s.reps[1]}`,
         restSeconds: s.rest,
-        ...(s.reasons.some((r) => r.startsWith("Swapped in by you")) ? { swappedByUser: true } : {}),
+        ...(s.reasons.some((r) => (typeof r === "string" ? r.startsWith("Swapped in by you") : r.k === "reason.swapped")) ? { swappedByUser: true } : {}),
       })),
     })),
-    weeklySetsPerMuscle: Object.fromEntries(MUSCLE_KEYS.map((m) => [MUSCLES[m], { sets: plan.weekly[m], target: plan.targets[m].target, minimum: plan.targets[m].floor }])),
-    appWarnings: plan.warnings.map((w) => w.text),
+    weeklySetsPerMuscle: Object.fromEntries(MUSCLE_KEYS.map((m) => [t.muscles[m], { sets: plan.weekly[m], target: plan.targets[m].target, minimum: plan.targets[m].floor }])),
+    appWarnings: plan.warnings.map((w) => t.msg(w.msg)),
   };
 }
 
-/** Plain-text prompt for pasting into any chatbot (offline fallback). */
-export function reviewPromptText(input: ReviewInput): string {
-  return `${SYSTEM_PROMPT}
+const systemPrompt = (replyIn: string) => (replyIn ? `${SYSTEM_PROMPT}\n${replyIn}` : SYSTEM_PROMPT);
+
+/** Plain-text prompt for pasting into any chatbot (offline fallback). `replyIn` asks for a reply language. */
+export function reviewPromptText(input: ReviewInput, replyIn = ""): string {
+  return `${systemPrompt(replyIn)}
 
 Reply with a short summary, then a list of findings. For each finding give a severity (high, medium, low or info), a title, an explanation and a concrete suggestion.
 
@@ -119,7 +130,7 @@ export class ReviewError extends Error {
 }
 
 /** Calls the Claude API with the user's own key. */
-export async function requestReview(apiKey: string, input: ReviewInput): Promise<ReviewResult> {
+export async function requestReview(apiKey: string, input: ReviewInput, replyIn = ""): Promise<ReviewResult> {
   if (!navigator.onLine) throw new ReviewError("offline", "You're offline. Use “Copy review prompt” instead, or try again when connected.");
   let Anthropic: typeof import("@anthropic-ai/sdk").default;
   try {
@@ -137,7 +148,7 @@ export async function requestReview(apiKey: string, input: ReviewInput): Promise
       betas: ["server-side-fallback-2026-07-01"],
       fallbacks: "default",
       output_config: { effort: "medium", format: { type: "json_schema", schema: REVIEW_SCHEMA } },
-      system: SYSTEM_PROMPT,
+      system: systemPrompt(replyIn),
       messages: [{ role: "user", content: `Review this plan:\n\n${JSON.stringify(input)}` }],
     });
   } catch (error) {

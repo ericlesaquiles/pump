@@ -1,3 +1,4 @@
+import { useI18n } from "../../hooks/useI18n.ts";
 import { cx, isoDate, parseIsoDate } from "../../lib/format.ts";
 import { dayLetter, nextDayIdx, sessionsByDate, weekDates } from "../../lib/rotation.ts";
 import type { Plan, Session } from "../../lib/types.ts";
@@ -13,6 +14,7 @@ interface Props {
 
 /** This week's training days (any weekday) and the next workout in the rotation. */
 export function ThisWeek({ plan, sessions, onStart }: Props) {
+  const { t } = useI18n();
   const today = isoDate(new Date());
   const dates = weekDates(new Date());
   const byDate = sessionsByDate(sessions);
@@ -22,10 +24,10 @@ export function ThisWeek({ plan, sessions, onStart }: Props) {
   const nextDay = plan.days[next];
 
   return (
-    <section className={styles.box} aria-label="This week">
+    <section className={styles.box} aria-label={t.plan.thisWeek}>
       <div className={styles.top}>
-        <span className={styles.label}>This week</span>
-        <span className={cx(styles.count, done >= goal && styles.met)}>{done} of {goal} workouts</span>
+        <span className={styles.label}>{t.plan.thisWeek}</span>
+        <span className={cx(styles.count, done >= goal && styles.met)}>{t.plan.weekCount(done, goal)}</span>
       </div>
       <ol className={styles.week}>
         {dates.map((d) => {
@@ -34,7 +36,7 @@ export function ThisWeek({ plan, sessions, onStart }: Props) {
           const s = list[list.length - 1];
           return (
             <li key={d} className={cx(styles.day, list.length > 0 && styles.on, d === today && styles.today)}>
-              <span>{date.toLocaleDateString(undefined, { weekday: "short" })}</span>
+              <span>{date.toLocaleDateString(t.locale, { weekday: "short" }).replace(".", "")}</span>
               <span className={styles.num}>{date.getDate()}</span>
               {s ? (
                 <span className={styles.done}>
@@ -51,10 +53,10 @@ export function ThisWeek({ plan, sessions, onStart }: Props) {
       {nextDay && (
         <div className={styles.next}>
           <span>
-            <span className={styles.label}>Up next</span>{" "}
-            <strong>Workout {dayLetter(next)} · {nextDay.name}</strong>
+            <span className={styles.label}>{t.plan.upNext}</span>{" "}
+            <strong>{t.workoutFull(next, nextDay.key)}</strong>
           </span>
-          <Button small onClick={() => onStart(next)}>Start workout {dayLetter(next)}</Button>
+          <Button small onClick={() => onStart(next)}>{t.plan.startWorkout(dayLetter(next))}</Button>
         </div>
       )}
     </section>

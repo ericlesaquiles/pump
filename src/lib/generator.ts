@@ -1,12 +1,12 @@
 // Rule-based plan generator. Pure functions: same answers + same exercise
 // list => same plan. See the design doc, "Plan generation algorithm".
 import {
-  PATTERNS, MUSCLES, MUSCLE_KEYS, SPLITS, DAY_TEMPLATES, PRESCRIPTION,
+  PATTERNS, MUSCLE_KEYS, SPLITS, DAY_TEMPLATES, PRESCRIPTION,
   BASE_WEEKLY_SETS, SKILL_RANK, PRIORITY_GROUPS, JOINTS, MOVEMENTS,
 } from "./constants.ts";
 import type {
-  Answers, Equipment, Exercise, Joint, Movement, Muscle, MuscleTarget, Pattern, Plan, PlanDay,
-  PlanExercise, PlanWarning, PriorityGroup, RawAnswers, Severity,
+  Answers, DayKey, Equipment, Exercise, Joint, Movement, Msg, Muscle, MuscleTarget, Pattern, Plan, PlanDay,
+  PlanExercise, PlanWarning, PriorityGroup, RawAnswers, Severity, Why,
 } from "./types.ts";
 
 export const LIMITS = {
@@ -81,16 +81,16 @@ export function hasEquipment(ex: Exercise, available: Set<string>): boolean {
 }
 
 /** Why an exercise can't be used at all (null = allowed). Order matters for messages. */
-export function exclusionReason(ex: Exercise, answers: Answers): string | null {
-  if (answers.dislikes.includes(ex.id)) return "on your skip list";
+export function exclusionReason(ex: Exercise, answers: Answers): Why | null {
+  if (answers.dislikes.includes(ex.id)) return { k: "dislike" };
   for (const [joint, stress] of entries(ex.joints)) {
     const sev = answers.injuries[joint];
-    if (sev === "injured" && stress >= 1) return `loads your injured ${JOINTS[joint].toLowerCase()}`;
-    if (sev === "avoid" && stress >= 2) return `loads your ${JOINTS[joint].toLowerCase()}`;
+    if (sev === "injured" && stress >= 1) return { k: "injured", joint };
+    if (sev === "avoid" && stress >= 2) return { k: "avoid", joint };
   }
-  for (const m of ex.moves) if (answers.painful.includes(m)) return `involves ${MOVEMENTS[m].toLowerCase()}`;
-  if (SKILL_RANK[ex.skill] > SKILL_RANK[answers.experience]) return "needs more experience";
-  if (!hasEquipment(ex, new Set(answers.equipment))) return "needs equipment you don't have";
+  for (const m of ex.moves) if (answers.painful.includes(m)) return { k: "move", move: m };
+  if (SKILL_RANK[ex.skill] > SKILL_RANK[answers.experience]) return { k: "skill" };
+  if (!hasEquipment(ex, new Set(answers.equipment))) return { k: "equipment" };
   return null;
 }
 
@@ -224,37 +224,33 @@ function prescribe(day: PlanDay, byId: ExerciseIndex, answers: Answers): void {
     const hit = mildJointsHit(ex, answers);
     s.reps = hit.length ? [reps[0] + 3, reps[1] + 3] : [reps[0], reps[1]];
     s.rest = restFor(ex, answers);
-    s.rir = ex.type === "isolation" ? "1–2 reps in reserve; last set may go to failure" : "1–2 reps in reserve";
+    s.rir = ex.type === "isolation" ? "iso" : "compound";
     s.lighter = hit;
   }
 }
 
-function slotReasons(pattern: Pattern, ex: Exercise, exercises: Exercise[], answers: Answers): string[] {
-  const reasons: string[] = [];
-  const pat = PATTERNS[pattern];
-  if (ex.pattern !== pattern) {
-    reasons.push(`No ${pat.label.toLowerCase()} exercise fits your equipment or limits, so this uses a ${PATTERNS[ex.pattern].label.toLowerCase()} instead.`);
-  } else {
-    reasons.push(`${pat.label} slot for ${MUSCLES[pat.main].toLowerCase()}${ex.staple ? "; a well-proven staple" : ""}.`);
-  }
+function slotReasons(pattern: Pattern, ex: Exercise, exercises: Exercise[], answers: Answers): Msg[] {
+  const reasons: Msg[] = [];
+  if (ex.pattern !== pattern) reasons.push({ k: "reason.fallback", want: pattern, got: ex.pattern });
+  else reasons.push({ k: "reason.slot", pattern, staple: ex.staple });
   const ideal = idealFor(pattern, exercises, answers);
   if (ideal && ideal.id !== ex.id) {
     const withItsEquipment = [...answers.equipment, ...ideal.equipment.flatMap((i) => i.split("|"))] as Equipment[];
     const why = exclusionReason(ideal, { ...answers, equipment: withItsEquipment });
-    if (why) reasons.push(`Instead of ${ideal.name}: it ${why}.`);
+    if (why) reasons.push({ k: "reason.insteadOf", ex: ideal.id, why });
   }
   const hit = mildJointsHit(ex, answers);
-  if (hit.length) reasons.push(`Lighter load and 3 more reps per set to go easy on your ${hit.map((j) => JOINTS[j].toLowerCase()).join(" and ")}.`);
+  if (hit.length) reasons.push({ k: "reason.lighter", joints: hit });
   return reasons;
 }
 
 // ---------- the generator ----------
 
-function newPlanExercise(slot: number, pattern: Pattern, optional: boolean, ex: Exercise, reasons: string[]): PlanExercise {
+function newPlanExercise(slot: number, pattern: Pattern, optional: boolean, ex: Exercise, reasons: Msg[]): PlanExercise {
   return {
     slot, pattern, optional, exId: ex.id,
     sets: optional ? 0 : ex.type === "compound" ? 3 : 2,
-    reasons, reps: [0, 0], rest: 0, rir: "", lighter: [],
+    reasons, reps: [0, 0], rest: 0, rir: "compound", lighter: [],
   };
 }
 
@@ -263,22 +259,22 @@ export function generatePlan(rawAnswers: RawAnswers, exercises: Exercise[], { no
   const byId = indexExercises(exercises);
   const split = SPLITS[answers.days]!;
   const targets = muscleTargets(answers);
-  const notices: string[] = [];
+  const notices: Msg[] = [];
   const used = new Map<string, number>();
 
   for (const [joint, sev] of entries(answers.injuries)) {
-    if (sev === "injured") notices.push(`Your ${JOINTS[joint].toLowerCase()} is marked as injured, so every exercise that loads it is left out. Get this plan checked by a physio or doctor before training that area.`);
+    if (sev === "injured") notices.push({ k: "notice.injured", joint });
   }
 
   // Steps 1 + 4 + 5: split, slots, fill each slot.
-  const days: PlanDay[] = split.days.map((key) => {
+  const days: PlanDay[] = split.days.map((key, dayIdx) => {
     const tpl = DAY_TEMPLATES[key];
-    const day: PlanDay = { key, name: tpl.name, focus: tpl.focus, estMinutes: 0, exercises: [] };
+    const day: PlanDay = { key, estMinutes: 0, exercises: [] };
     const inDay = new Set<string>();
     tpl.slots.forEach((slot, slotIdx) => {
       const best = candidatesFor(slot.p, exercises, answers, { used, exclude: inDay })[0];
       if (!best) {
-        if (!slot.opt) notices.push(`${tpl.name}: no ${PATTERNS[slot.p].label.toLowerCase()} exercise fits your equipment and limits, so that slot is left out.`);
+        if (!slot.opt) notices.push({ k: "notice.slotMissing", day: dayIdx, key, pattern: slot.p });
         return;
       }
       inDay.add(best.ex.id);
@@ -309,20 +305,20 @@ export function generatePlan(rawAnswers: RawAnswers, exercises: Exercise[], { no
   // Step 7: checks and targeted repairs.
   repair(days, byId, answers, targets, budget);
 
-  for (const day of days) {
-    if (!day.exercises.some((s) => s.sets > 0)) {
-      notices.push(`${day.name} days have no exercises that fit your equipment and limits. Adding a pull-up bar, resistance bands or dumbbells would fill them.`);
-    }
-  }
+  const emptyDays = new Map<DayKey, number[]>();
+  days.forEach((day, i) => {
+    if (!day.exercises.some((s) => s.sets > 0)) emptyDays.set(day.key, [...(emptyDays.get(day.key) ?? []), i]);
+  });
+  for (const [key, idxs] of emptyDays) notices.push({ k: "notice.dayEmpty", days: idxs, key });
 
   const plan: Plan = {
+    v: 2,
     id: `plan-${now.getTime()}`,
     createdAt: now.toISOString(),
-    splitName: split.name,
     answers,
     targets,
     days,
-    notices: [...new Set(notices)],
+    notices,
     weekly: weeklySets(days, byId),
     warnings: [],
   };
@@ -446,21 +442,35 @@ export function checkPlan(plan: Plan): PlanWarning[] {
   const { targets, answers } = plan;
   for (const m of MUSCLE_KEYS) {
     const t = targets[m];
-    if (plan.weekly[m] + 1e-9 < t.floor) warnings.push({ kind: "volume", muscle: m, text: `${MUSCLES[m]}: ${plan.weekly[m]} sets a week, below the minimum of ${t.floor}.` });
+    if (plan.weekly[m] + 1e-9 < t.floor) warnings.push({ kind: "volume", muscle: m, msg: { k: "warn.volume", muscle: m, sets: plan.weekly[m], floor: t.floor } });
   }
   const push = groupSets(plan.days, PUSH);
   const pull = groupSets(plan.days, PULL);
-  if (push > 0 && pull < push * 0.9) warnings.push({ kind: "balance", text: `Pushing (${push} sets) outweighs pulling (${pull} sets). Aim for at least as much pulling.` });
+  if (push > 0 && pull < push * 0.9) warnings.push({ kind: "balance", msg: { k: "warn.pushPull", push, pull } });
   const q = plan.weekly.quads;
   const h = plan.weekly.hamstrings;
-  if (q > 0 && h < q * 0.5) warnings.push({ kind: "balance", text: `Hamstrings (${h} sets) get less than half the work of quads (${q} sets).` });
-  for (const day of plan.days) {
-    if (day.estMinutes > answers.minutes * 1.05) warnings.push({ kind: "time", text: `${day.name} takes about ${day.estMinutes} min, over your ${answers.minutes} min.` });
-  }
+  if (q > 0 && h < q * 0.5) warnings.push({ kind: "balance", msg: { k: "warn.hamQuad", h, q } });
+  plan.days.forEach((day, i) => {
+    if (day.estMinutes > answers.minutes * 1.05) warnings.push({ kind: "time", msg: { k: "warn.time", day: i, key: day.key, minutes: day.estMinutes, limit: answers.minutes } });
+  });
   const short = warnings.filter((w) => w.kind === "volume").length;
   const full = plan.days.filter((d) => d.exercises.some((s) => s.sets)).every((d) => d.estMinutes >= answers.minutes * 0.9);
   if (short >= 3 && full) {
-    warnings.unshift({ kind: "time", text: "Every session is already full, which is why several muscles fall short. Longer sessions or one more training day would cover them." });
+    warnings.unshift({ kind: "time", msg: { k: "warn.full" } });
   }
   return warnings;
+}
+
+/**
+ * Bring a plan saved by an older version up to date: drop the fixed weekdays and
+ * English day names, and recompute prescriptions and warnings as messages.
+ * Exercise reasons and notices from old plans stay as the English text they were saved with.
+ */
+export function migratePlan(plan: Plan, exercises: Exercise[]): Plan {
+  if (plan.v === 2) return plan;
+  const next = structuredClone(plan) as Plan & { splitName?: unknown };
+  delete next.splitName;
+  next.days = next.days.map(({ key, estMinutes, exercises: ex }) => ({ key, estMinutes, exercises: ex }));
+  next.v = 2;
+  return refreshPlan(next, exercises);
 }

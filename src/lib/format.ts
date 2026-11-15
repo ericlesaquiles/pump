@@ -11,8 +11,8 @@ export function parseIsoDate(s: string): Date {
   return new Date(y, m - 1, d);
 }
 
-export function fmtDate(s: string): string {
-  return parseIsoDate(s).toLocaleDateString(undefined, { weekday: "short", month: "short", day: "numeric" });
+export function fmtDate(s: string, locale?: string): string {
+  return parseIsoDate(s).toLocaleDateString(locale, { weekday: "short", month: "short", day: "numeric" });
 }
 
 export function fmtRest(sec: number): string {
@@ -23,13 +23,14 @@ export function fmtClock(sec: number): string {
   return `${Math.floor(sec / 60)}:${String(sec % 60).padStart(2, "0")}`;
 }
 
-/** Weight or set count without trailing zeros. */
-export function fmtNum(n: number): string {
-  return String(Math.round(n * 100) / 100);
+/** Weight or set count without trailing zeros (and with a decimal comma in Portuguese). */
+export function fmtNum(n: number, locale?: string): string {
+  const r = Math.round(n * 100) / 100;
+  return locale ? r.toLocaleString(locale, { maximumFractionDigits: 2, useGrouping: false }) : String(r);
 }
 
-export function fmtSets(sets: { w: number | null; r: number | null }[]): string {
-  return sets.map((x) => `${x.w ? `${fmtNum(x.w)}×` : ""}${x.r ?? "–"}`).join(", ");
+export function fmtSets(sets: { w: number | null; r: number | null }[], locale?: string): string {
+  return sets.map((x) => `${x.w ? `${fmtNum(x.w, locale)}×` : ""}${x.r ?? "–"}`).join(locale?.startsWith("pt") ? "; " : ", ");
 }
 
 /** Join class names, skipping falsy ones. */

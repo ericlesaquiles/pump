@@ -1,4 +1,4 @@
-import { EXERCISE_BY_ID } from "../../data/exercises.ts";
+import { useI18n } from "../../hooks/useI18n.ts";
 import { fmtRest } from "../../lib/format.ts";
 import type { PlanExercise } from "../../lib/types.ts";
 import { Button } from "../common/Button.tsx";
@@ -12,23 +12,23 @@ interface Props {
 }
 
 export function ExerciseRow({ item, onInfo, onSwap }: Props) {
-  const ex = EXERCISE_BY_ID.get(item.exId);
-  if (!ex) return null;
+  const { t, exName, text } = useI18n();
+  const reasons = item.reasons.map(text);
   return (
     <li className={styles.row}>
       <div>
-        <Button variant="link" className={styles.name} onClick={() => onInfo(ex.id)}>{ex.name}</Button>
+        <Button variant="link" className={styles.name} onClick={() => onInfo(item.exId)}>{exName(item.exId)}</Button>
         <div className={styles.rx}>
-          {item.sets} × {item.reps[0]}–{item.reps[1]} · rest {fmtRest(item.rest)}
-          {item.lighter.length > 0 && <> · <Chip tone="warn">lighter load</Chip></>}
+          {item.sets} × {item.reps[0]}–{item.reps[1]} · {t.plan.rest} {fmtRest(item.rest)}
+          {item.lighter.length > 0 && <> · <Chip tone="warn">{t.plan.lighter}</Chip></>}
         </div>
       </div>
-      <Button variant="ghost" small onClick={onSwap}>Swap</Button>
+      <Button variant="ghost" small onClick={onSwap}>{t.plan.swap}</Button>
       <details className={styles.why}>
-        <summary>Why this exercise?</summary>
+        <summary>{t.plan.why}</summary>
         <ul>
-          {item.reasons.map((r) => <li key={r}>{r}</li>)}
-          <li>{item.rir}.</li>
+          {reasons.map((r) => <li key={r}>{r}</li>)}
+          <li>{t.rir[item.rir] ?? t.rir.compound}.</li>
         </ul>
       </details>
     </li>

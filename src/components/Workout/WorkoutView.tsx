@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from "react";
-import { EXERCISES, EXERCISE_BY_ID } from "../../data/exercises.ts";
+import { EXERCISES } from "../../data/exercises.ts";
 import { defaultLogSelection, useAppState } from "../../hooks/useAppState.tsx";
+import { useI18n } from "../../hooks/useI18n.ts";
 import { useToast } from "../../hooks/useToast.tsx";
 import { isoDate } from "../../lib/format.ts";
 import { setKeepAwake } from "../../lib/native.ts";
@@ -28,6 +29,7 @@ function loadWorkout(plan: Plan, dayIdx: number, date: string, sessions: Paramet
 export function WorkoutView({ plan }: { plan: Plan }) {
   const { sessions, settings, logSel, setLogSel, saveSession, updatePlan } = useAppState();
   const toast = useToast();
+  const { t, exName } = useI18n();
   const sel = logSel && logSel.dayIdx < plan.days.length ? logSel : defaultLogSelection(plan, sessions);
   const day = plan.days[sel.dayIdx];
   const next = nextDayIdx(plan, sessions);
@@ -73,38 +75,38 @@ export function WorkoutView({ plan }: { plan: Plan }) {
 
   const save = () => {
     const session = workoutToSession(workout, plan);
-    if (!session) { setError("Enter reps for at least one set before saving."); return; }
+    if (!session) { setError(t.workout.needReps); return; }
     saveSession(session);
     store.setDraft(workout.id, null);
     const painful = session.entries.filter((e) => e.sets.some((s) => s.hurt));
     setHurt(painful.length ? {
-      names: painful.map((e) => EXERCISE_BY_ID.get(e.exId)?.name ?? e.exId),
+      exIds: painful.map((e) => e.exId),
       slots: painful.map((e) => ({ dayIdx: session.dayIdx, slot: e.slot, exId: plan.days[session.dayIdx]?.exercises[e.slot]?.exId ?? e.exId })),
     } : null);
     setState({ workout: { ...workout, saved: true }, fromDraft: false });
     setDirty(false);
-    toast("Workout saved");
+    toast(t.workout.savedToast);
     window.scrollTo({ top: 0 });
   };
 
   if (!day) return null;
-  const status = error ?? (dirty || state.fromDraft ? "Unsaved changes are kept on this device as a draft." : workout.saved ? "Saved." : "");
+  const status = error ?? (dirty || state.fromDraft ? t.workout.draft : workout.saved ? t.workout.saved : "");
 
   return (
     <>
       <PageHeader
-        eyebrow="Workout"
-        title={`Workout ${dayLetter(sel.dayIdx)} · ${day.name}`}
+        eyebrow={t.workout.eyebrow}
+        title={t.workoutFull(sel.dayIdx, day.key)}
         actions={
           <>
             <label className={styles.field}>
-              <span className={styles.label}>Workout</span>
+              <span className={styles.label}>{t.workout.pick}</span>
               <select value={sel.dayIdx} onChange={(e) => { setLogSel({ ...sel, dayIdx: Number(e.target.value) }); setHurt(null); }}>
-                {plan.days.map((d, i) => <option key={i} value={i}>{dayLetter(i)} · {d.name}{i === next ? " (next)" : ""}</option>)}
+                {plan.days.map((d, i) => <option key={i} value={i}>{t.workout.option(dayLetter(i), t.days[d.key].name, i === next)}</option>)}
               </select>
             </label>
             <label className={styles.field}>
-              <span className={styles.label}>Date</span>
+              <span className={styles.label}>{t.workout.date}</span>
               <input type="date" value={sel.date} onChange={(e) => { setLogSel({ ...sel, date: e.target.value || isoDate(new Date()) }); setHurt(null); }} />
             </label>
           </>
@@ -113,7 +115,7 @@ export function WorkoutView({ plan }: { plan: Plan }) {
 
       {hurt && <HurtCallout info={hurt} onDismiss={() => setHurt(null)} onSwap={(dayIdx, slot) => setSwap({ entryIdx: -1, mode: "plan", dayIdx, slot })} />}
 
-      {workout.entries.length === 0 && <Callout>This workout has no exercises. Pick another one.</Callout>}
+      {workout.entries.length === 0 && <Callout>{t.workout.empty}</Callout>}
       {workout.entries.map((entry, i) => {
         const slot = day.exercises[entry.slot];
         if (!slot) return null;
@@ -133,12 +135,12 @@ export function WorkoutView({ plan }: { plan: Plan }) {
       })}
 
       <label className={styles.notes}>
-        <span className={styles.label}>Notes</span>
-        <textarea rows={3} value={workout.note} placeholder="Sleep, energy, anything that felt off" onChange={(e) => edit((w) => ({ ...w, note: e.target.value }))} />
+        <span className={styles.label}>{t.workout.notes}</span>
+        <textarea rows={3} value={workout.note} placeholder={t.workout.notesHint} onChange={(e) => edit((w) => ({ ...w, note: e.target.value }))} />
       </label>
 
       <div className={styles.savebar}>
-        <Button onClick={save}>{workout.saved ? "Update workout" : "Save workout"}</Button>
+        <Button onClick={save}>{workout.saved ? t.workout.update : t.workout.save}</Button>
         <span className={error ? styles.error : styles.status} role={error ? "alert" : undefined}>{status}</span>
       </div>
 
@@ -156,7 +158,7 @@ export function WorkoutView({ plan }: { plan: Plan }) {
             } else {
               updatePlan(applySwap(plan, swap.dayIdx, swap.slot, exId, EXERCISES, scope));
               setHurt(null);
-              toast(`Swapped in ${EXERCISE_BY_ID.get(exId)?.name ?? exId}`);
+              toast(t.plan.swappedIn(exName(exId)));
             }
             setSwap(null);
           }}

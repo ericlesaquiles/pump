@@ -1,4 +1,5 @@
 import { useEffect, useRef, type ReactNode } from "react";
+import { useI18n } from "../../hooks/useI18n.ts";
 import { Button } from "./Button.tsx";
 import styles from "./Dialog.module.css";
 
@@ -12,7 +13,8 @@ interface Props {
 }
 
 /** A modal built on <dialog>. Render it to open it; unmount it to close. */
-export function Dialog({ title, eyebrow, onClose, closeLabel = "Close", footer, children }: Props) {
+export function Dialog({ title, eyebrow, onClose, closeLabel, footer, children }: Props) {
+  const { t } = useI18n();
   const ref = useRef<HTMLDialogElement>(null);
 
   useEffect(() => {
@@ -29,7 +31,7 @@ export function Dialog({ title, eyebrow, onClose, closeLabel = "Close", footer, 
             {eyebrow && <div className={styles.eyebrow}>{eyebrow}</div>}
             <h2>{title}</h2>
           </div>
-          <Button variant="ghost" small onClick={onClose}>{closeLabel}</Button>
+          <Button variant="ghost" small onClick={onClose}>{closeLabel ?? t.close}</Button>
         </div>
         {children}
         {footer && <div className={styles.foot}>{footer}</div>}

@@ -3,10 +3,11 @@
   align-items: center;
   gap: 4px;
   padding: 2px 8px;
-  border-radius: 999px;
+  border-radius: 12px;
   font-size: 0.76rem;
   font-weight: 600;
-  white-space: nowrap;
+  /* Long cues ("No history yet…") wrap instead of widening the page. */
+  max-width: 100%;
 }
 .good { background: var(--good-bg); color: var(--good); }
 .warn { background: var(--warn-bg); color: var(--warn); }

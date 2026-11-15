@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
-import { fmtDate } from "../../lib/format.ts";
-import { dayLetter } from "../../lib/rotation.ts";
+import { useI18n } from "../../hooks/useI18n.ts";
 import type { Session } from "../../lib/types.ts";
 import { Button } from "../common/Button.tsx";
 import { Plate } from "../common/Plate.tsx";
@@ -17,15 +16,16 @@ interface Props {
 
 /** Logged workouts, newest first, with a two-step delete. */
 export function SessionList({ sessions, onOpen, onDelete }: Props) {
+  const { t, date } = useI18n();
   const [armed, setArmed] = useState<string | null>(null);
   useEffect(() => {
     if (!armed) return;
-    const t = window.setTimeout(() => setArmed(null), 3000);
-    return () => window.clearTimeout(t);
+    const id = window.setTimeout(() => setArmed(null), 3000);
+    return () => window.clearTimeout(id);
   }, [armed]);
 
   if (!sessions.length) {
-    return <p className={styles.empty}>No workouts yet. Open the Workout tab, fill in your sets and press Save; they'll show up here.</p>;
+    return <p className={styles.empty}>{t.history.empty}</p>;
   }
   return (
     <ul className={styles.list}>
@@ -33,13 +33,13 @@ export function SessionList({ sessions, onOpen, onDelete }: Props) {
         <li key={s.id} className={styles.item}>
           <Plate day={s.dayKey} />
           <button type="button" className={styles.open} onClick={() => onOpen(s)}>
-            <strong>{dayLetter(s.dayIdx)} · {s.dayName}</strong> · {fmtDate(s.date)}
-            <span className={styles.meta}>{setCount(s)} sets · {Math.round(volume(s)).toLocaleString()} {s.unit} lifted</span>
+            <strong>{t.workoutFull(s.dayIdx, s.dayKey)}</strong> · {date(s.date)}
+            <span className={styles.meta}>{t.history.meta(setCount(s), Math.round(volume(s)).toLocaleString(t.locale), s.unit)}</span>
           </button>
           {armed === s.id ? (
-            <Button variant="danger" small onClick={() => { setArmed(null); onDelete(s); }}>Confirm delete</Button>
+            <Button variant="danger" small onClick={() => { setArmed(null); onDelete(s); }}>{t.history.confirm}</Button>
           ) : (
-            <Button variant="ghost" small onClick={() => setArmed(s.id)}>Delete</Button>
+            <Button variant="ghost" small onClick={() => setArmed(s.id)}>{t.history.delete}</Button>
           )}
         </li>
       ))}

@@ -1,9 +1,9 @@
-import { EXERCISE_BY_ID } from "../../data/exercises.ts";
+import { useI18n } from "../../hooks/useI18n.ts";
 import { Button, LinkButton } from "../common/Button.tsx";
 import { Callout } from "../common/Callout.tsx";
 import styles from "./HurtCallout.module.css";
 
-export interface HurtInfo { names: string[]; slots: { dayIdx: number; slot: number; exId: string }[] }
+export interface HurtInfo { exIds: string[]; slots: { dayIdx: number; slot: number; exId: string }[] }
 
 interface Props {
   info: HurtInfo;
@@ -13,17 +13,18 @@ interface Props {
 
 /** Shown after saving a workout where a set was marked as painful. */
 export function HurtCallout({ info, onSwap, onDismiss }: Props) {
+  const { t, exName } = useI18n();
   return (
-    <Callout tone="warn" title={`You marked pain during ${info.names.join(", ")}.`}>
-      <span>If it keeps hurting, swap the exercise or add a limitation so the plan avoids it. See a physio or doctor if pain persists.</span>
+    <Callout tone="warn" title={t.workout.hurtTitle(info.exIds.map(exName))}>
+      <span>{t.workout.hurtText}</span>
       <div className={styles.row}>
         {info.slots.map((s) => (
           <Button key={`${s.dayIdx}-${s.slot}`} small onClick={() => onSwap(s.dayIdx, s.slot)}>
-            Swap {EXERCISE_BY_ID.get(s.exId)?.name ?? s.exId} in the plan
+            {t.workout.hurtSwap(exName(s.exId))}
           </Button>
         ))}
-        <LinkButton small href="#setup">Add a limitation</LinkButton>
-        <Button variant="ghost" small onClick={onDismiss}>Dismiss</Button>
+        <LinkButton small href="#setup">{t.workout.addLimitation}</LinkButton>
+        <Button variant="ghost" small onClick={onDismiss}>{t.workout.dismiss}</Button>
       </div>
     </Callout>
   );

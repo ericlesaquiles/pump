@@ -38,7 +38,7 @@ export function workoutToSession(w: WorkoutDraft, plan: Plan): Session | null {
     .filter((e) => e.sets.length > 0);
   if (!entries.length) return null;
   return {
-    id: w.id, planId: w.planId, date: w.date, dayIdx: w.dayIdx, dayKey: day.key, dayName: day.name,
+    id: w.id, planId: w.planId, date: w.date, dayIdx: w.dayIdx, dayKey: day.key,
     unit: w.unit, entries, note: w.note.trim(), savedAt: new Date().toISOString(),
   };
 }

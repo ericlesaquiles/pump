@@ -22,9 +22,9 @@ export function setupAndroid(): void {
 }
 
 /** Save a backup file and open the Android share sheet (Drive, email, Files…). */
-export async function shareBackup(filename: string, json: string): Promise<void> {
+export async function shareBackup(filename: string, json: string, text: { title: string; dialogTitle: string }): Promise<void> {
   const { uri } = await Filesystem.writeFile({ path: filename, data: json, directory: Directory.Cache, encoding: Encoding.UTF8 });
-  await Share.share({ title: "Pump backup", files: [uri], dialogTitle: "Save your Pump backup" });
+  await Share.share({ title: text.title, files: [uri], dialogTitle: text.dialogTitle });
 }
 
 /** Keep the screen on while a workout is open. */
@@ -50,7 +50,7 @@ const REST_NOTIFICATION_ID = 1;
  * Notify when rest is over, so it works with the phone locked.
  * Asks for notification permission the first time; does nothing if refused.
  */
-export async function scheduleRestEnd(seconds: number): Promise<void> {
+export async function scheduleRestEnd(seconds: number, text: { title: string; body: string }): Promise<void> {
   if (!isNative) return;
   try {
     let perm = await LocalNotifications.checkPermissions();
@@ -60,8 +60,8 @@ export async function scheduleRestEnd(seconds: number): Promise<void> {
     await LocalNotifications.schedule({
       notifications: [{
         id: REST_NOTIFICATION_ID,
-        title: "Rest over",
-        body: "Time for your next set.",
+        title: text.title,
+        body: text.body,
         schedule: { at: new Date(Date.now() + seconds * 1000), allowWhileIdle: true },
       }],
     });

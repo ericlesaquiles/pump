@@ -20,6 +20,39 @@ export type Experience = "beginner" | "intermediate" | "advanced";
 export type PriorityGroup = "chest" | "back" | "shoulders" | "arms" | "quads" | "hamstrings" | "glutes" | "calves" | "abs";
 export type DayKey = "full_a" | "full_b" | "full_c" | "upper" | "lower" | "push" | "pull" | "legs";
 export type Unit = "kg" | "lb";
+export type Lang = "en" | "pt";
+
+/** Why an exercise can't be used (see exclusionReason). */
+export type Why =
+  | { k: "dislike" }
+  | { k: "injured"; joint: Joint }
+  | { k: "avoid"; joint: Joint }
+  | { k: "move"; move: Movement }
+  | { k: "skill" }
+  | { k: "equipment" };
+
+/**
+ * A sentence stored in a plan as data, so it can be shown in any language.
+ * `day` is a workout's index in the plan (0 = Workout A); `ex` is an exercise id.
+ */
+export type Msg =
+  | { k: "reason.fallback"; want: Pattern; got: Pattern }
+  | { k: "reason.slot"; pattern: Pattern; staple: boolean }
+  | { k: "reason.insteadOf"; ex: string; why: Why }
+  | { k: "reason.lighter"; joints: Joint[] }
+  | { k: "reason.swapped"; ex: string }
+  | { k: "reason.replacedSkipped"; ex: string }
+  | { k: "notice.injured"; joint: Joint }
+  | { k: "notice.slotMissing"; day: number; key: DayKey; pattern: Pattern }
+  | { k: "notice.dayEmpty"; days: number[]; key: DayKey }
+  | { k: "warn.volume"; muscle: Muscle; sets: number; floor: number }
+  | { k: "warn.pushPull"; push: number; pull: number }
+  | { k: "warn.hamQuad"; h: number; q: number }
+  | { k: "warn.time"; day: number; key: DayKey; minutes: number; limit: number }
+  | { k: "warn.full" };
+
+/** Plans saved before version 2 hold plain English strings instead of messages. */
+export type Text = string | Msg;
 
 export interface Exercise {
   id: string;
@@ -61,18 +94,16 @@ export interface PlanExercise {
   optional: boolean;
   exId: string;
   sets: number;
-  reasons: string[];
+  reasons: Text[];
   reps: [number, number];
   rest: number;
-  rir: string;
+  rir: "iso" | "compound";
   /** Joints with a mild limitation that this exercise loads (lighter load, more reps). */
   lighter: Joint[];
 }
 
 export interface PlanDay {
   key: DayKey;
-  name: string;
-  focus: string;
   estMinutes: number;
   exercises: PlanExercise[];
 }
@@ -86,7 +117,7 @@ export interface MuscleTarget {
 export interface PlanWarning {
   kind: "volume" | "balance" | "time";
   muscle?: Muscle;
-  text: string;
+  msg: Msg;
 }
 
 export interface ReviewFinding {
@@ -105,13 +136,14 @@ export interface PlanReview {
 }
 
 export interface Plan {
+  /** Data format; 2 = messages instead of text, workouts in rotation. Older plans are migrated on load. */
+  v?: 2;
   id: string;
   createdAt: string;
-  splitName: string;
   answers: Answers;
   targets: Record<Muscle, MuscleTarget>;
   days: PlanDay[];
-  notices: string[];
+  notices: Text[];
   weekly: Record<Muscle, number>;
   warnings: PlanWarning[];
   review?: PlanReview;
@@ -136,7 +168,8 @@ export interface Session {
   date: string;
   dayIdx: number;
   dayKey: DayKey;
-  dayName: string;
+  /** Only in workouts saved by older versions. */
+  dayName?: string;
   unit: Unit;
   entries: SessionEntry[];
   note: string;
@@ -156,6 +189,7 @@ export interface WorkoutDraft {
 }
 
 export interface Settings {
+  lang: Lang;
   unit: Unit;
   aiEnabled: boolean;
   apiKey: string;

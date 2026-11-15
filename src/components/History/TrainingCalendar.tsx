@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useI18n } from "../../hooks/useI18n.ts";
 import { cx, isoDate, parseIsoDate } from "../../lib/format.ts";
 import { dayLetter, monthGrid, sessionsByDate, weekDates } from "../../lib/rotation.ts";
 import type { Session } from "../../lib/types.ts";
@@ -14,26 +15,28 @@ interface Props {
 
 /** Month view of the days you trained. Tap a marked day to open that workout. */
 export function TrainingCalendar({ sessions, onOpen }: Props) {
+  const { t } = useI18n();
   const now = new Date();
   const [month, setMonth] = useState({ y: now.getFullYear(), m: now.getMonth() });
   const today = isoDate(now);
   const byDate = sessionsByDate(sessions);
   const weeks = monthGrid(month.y, month.m);
   const inMonth = weeks.flat().reduce((n, d) => n + (d ? byDate.get(d)?.length ?? 0 : 0), 0);
-  const title = new Date(month.y, month.m, 1).toLocaleDateString(undefined, { month: "long", year: "numeric" });
-  const heads = weekDates(now).map((d) => parseIsoDate(d).toLocaleDateString(undefined, { weekday: "narrow" }));
+  const monthName = new Date(month.y, month.m, 1).toLocaleDateString(t.locale, { month: "long", year: "numeric" });
+  const title = monthName.charAt(0).toUpperCase() + monthName.slice(1);
+  const heads = weekDates(now).map((d) => parseIsoDate(d).toLocaleDateString(t.locale, { weekday: "narrow" }));
   const shift = (k: number) => setMonth(({ y, m }) => ({ y: m + k < 0 ? y - 1 : m + k > 11 ? y + 1 : y, m: (m + k + 12) % 12 }));
   const isCurrent = month.y === now.getFullYear() && month.m === now.getMonth();
 
   return (
-    <Panel label="Training days">
+    <Panel label={t.history.calendar}>
       <div className={styles.nav}>
-        <Button variant="ghost" small onClick={() => shift(-1)} aria-label="Previous month">‹</Button>
+        <Button variant="ghost" small onClick={() => shift(-1)} aria-label={t.history.prevMonth}>‹</Button>
         <div className={styles.title}>
           <strong>{title}</strong>
-          <span className={styles.muted}>{inMonth} workout{inMonth === 1 ? "" : "s"}</span>
+          <span className={styles.muted}>{t.history.inMonth(inMonth)}</span>
         </div>
-        <Button variant="ghost" small onClick={() => shift(1)} disabled={isCurrent} aria-label="Next month">›</Button>
+        <Button variant="ghost" small onClick={() => shift(1)} disabled={isCurrent} aria-label={t.history.nextMonth}>›</Button>
       </div>
       <table className={styles.cal}>
         <thead>
@@ -54,7 +57,7 @@ export function TrainingCalendar({ sessions, onOpen }: Props) {
                         type="button"
                         className={cx(styles.cell, styles.on, d === today && styles.today)}
                         onClick={() => onOpen(s)}
-                        aria-label={`${parseIsoDate(d).toLocaleDateString()}: workout ${list.map((x) => dayLetter(x.dayIdx)).join(", ")}`}
+                        aria-label={t.history.dayLabel(parseIsoDate(d).toLocaleDateString(t.locale), list.map((x) => dayLetter(x.dayIdx)).join(", "))}
                       >
                         <span>{label}</span>
                         <span className={styles.mark}><Plate day={s.dayKey} />{list.map((x) => dayLetter(x.dayIdx)).join("+")}</span>

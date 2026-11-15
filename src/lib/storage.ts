@@ -7,6 +7,7 @@
 // first, then to Preferences in the background. The `store` API stays synchronous.
 import { Preferences } from "@capacitor/preferences";
 import { isNative } from "./platform.ts";
+import { detectLang } from "../i18n/index.ts";
 import type { Answers, Plan, Session, Settings, WorkoutDraft } from "./types.ts";
 
 const PREFIX = "pump:";
@@ -79,7 +80,8 @@ function write(key: string, value: unknown): boolean {
   }
 }
 
-export const DEFAULT_SETTINGS: Settings = { unit: "kg", aiEnabled: false, apiKey: "" };
+/** Default settings; the language follows the phone or browser. */
+export const defaultSettings = (): Settings => ({ lang: detectLang(), unit: "kg", aiEnabled: false, apiKey: "" });
 
 export interface Backup {
   app: "pump";
@@ -91,6 +93,10 @@ export interface Backup {
   settings: Omit<Settings, "apiKey">;
 }
 
+export class NotABackupError extends Error {
+  constructor() { super("This file isn't a Pump backup."); }
+}
+
 export const store = {
   getAnswers: () => read<Answers | null>(KEYS.answers, null),
   setAnswers: (a: Answers | null) => write(KEYS.answers, a),
@@ -98,7 +104,7 @@ export const store = {
   setPlan: (p: Plan | null) => write(KEYS.plan, p),
   getSessions: () => read<Session[]>(KEYS.sessions, []),
   setSessions: (s: Session[]) => write(KEYS.sessions, s),
-  getSettings: (): Settings => ({ ...DEFAULT_SETTINGS, ...read<Partial<Settings>>(KEYS.settings, {}) }),
+  getSettings: (): Settings => ({ ...defaultSettings(), ...read<Partial<Settings>>(KEYS.settings, {}) }),
   setSettings: (s: Settings) => write(KEYS.settings, s),
   getDraft: (id: string) => read<WorkoutDraft | null>(`${KEYS.draft}:${id}`, null),
   setDraft: (id: string, d: WorkoutDraft | null) => write(`${KEYS.draft}:${id}`, d),
@@ -110,7 +116,7 @@ export const store = {
   },
   importAll(data: unknown): void {
     const b = data as Partial<Backup> | null;
-    if (!b || b.app !== "pump") throw new Error("This file isn't a Pump backup.");
+    if (!b || b.app !== "pump") throw new NotABackupError();
     if (b.answers) this.setAnswers(b.answers);
     if (b.plan) this.setPlan(b.plan);
     if (Array.isArray(b.sessions)) this.setSessions(b.sessions);

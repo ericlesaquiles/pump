@@ -1,12 +1,14 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { RestTimer } from "../components/Workout/RestTimer.tsx";
 import { buzz, cancelRestEnd, scheduleRestEnd } from "../lib/native.ts";
+import { useI18n } from "./useI18n.ts";
 
 interface TimerApi { start: (seconds: number) => void }
 const Ctx = createContext<TimerApi>({ start: () => {} });
 
 /** One floating rest timer for the whole app. */
 export function RestTimerProvider({ children }: { children: ReactNode }) {
+  const { t } = useI18n();
   const [end, setEnd] = useState<number | null>(null);
   const [now, setNow] = useState(() => Date.now());
 
@@ -27,8 +29,8 @@ export function RestTimerProvider({ children }: { children: ReactNode }) {
     setNow(Date.now());
     setEnd(Date.now() + seconds * 1000);
     // On Android, also notify when rest ends in case the phone is locked.
-    void scheduleRestEnd(seconds);
-  }, []);
+    void scheduleRestEnd(seconds, { title: t.workout.notifTitle, body: t.workout.notifBody });
+  }, [t]);
 
   const stop = useCallback(() => {
     setEnd(null);

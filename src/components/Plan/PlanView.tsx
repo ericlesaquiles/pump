@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { EXERCISES, EXERCISE_BY_ID } from "../../data/exercises.ts";
+import { EXERCISES } from "../../data/exercises.ts";
 import { useAppState } from "../../hooks/useAppState.tsx";
+import { useI18n } from "../../hooks/useI18n.ts";
 import { useToast } from "../../hooks/useToast.tsx";
-import { GOALS } from "../../lib/constants.ts";
 import { isoDate } from "../../lib/format.ts";
 import { nextDayIdx } from "../../lib/rotation.ts";
 import { applySwap } from "../../lib/swap.ts";
@@ -23,6 +23,7 @@ import styles from "./PlanView.module.css";
 export function PlanView({ plan }: { plan: Plan }) {
   const { sessions, rebuildPlan, updatePlan, setLogSel } = useAppState();
   const toast = useToast();
+  const { t, text, exName } = useI18n();
   const [infoId, setInfoId] = useState<string | null>(null);
   const [swap, setSwap] = useState<{ dayIdx: number; exIdx: number } | null>(null);
   const a = plan.answers;
@@ -32,17 +33,17 @@ export function PlanView({ plan }: { plan: Plan }) {
   return (
     <>
       <PageHeader
-        eyebrow={`${plan.splitName} · ${a.days}× a week · ${a.minutes} min · ${GOALS[a.goal]}`}
-        title="Your plan"
+        eyebrow={t.plan.eyebrow(t.splits[a.days] ?? "", a.days, a.minutes, t.goals[a.goal])}
+        title={t.plan.title}
         actions={
           <>
-            <LinkButton href="#setup">Edit answers</LinkButton>
-            <Button variant="ghost" onClick={() => { rebuildPlan(); toast("Plan rebuilt"); }}>Rebuild plan</Button>
+            <LinkButton href="#setup">{t.plan.editAnswers}</LinkButton>
+            <Button variant="ghost" onClick={() => { rebuildPlan(); toast(t.plan.rebuilt); }}>{t.plan.rebuild}</Button>
           </>
         }
       />
-      {plan.notices.length > 0 && <Callout tone="danger" items={plan.notices} />}
-      {plan.warnings.length > 0 && <Callout tone="warn" title="Things to know about this plan" items={plan.warnings.map((w) => w.text)} />}
+      {plan.notices.length > 0 && <Callout tone="danger" items={plan.notices.map(text)} />}
+      {plan.warnings.length > 0 && <Callout tone="warn" title={t.plan.warningsTitle} items={plan.warnings.map((w) => text(w.msg))} />}
       <ThisWeek plan={plan} sessions={sessions} onStart={start} />
 
       <div className={styles.grid}>
@@ -60,9 +61,9 @@ export function PlanView({ plan }: { plan: Plan }) {
           ))}
         </div>
         <aside className={styles.stack}>
-          <Panel label="Weekly sets per muscle">
+          <Panel label={t.plan.weeklySets}>
             <VolumeChart plan={plan} />
-            <p className={styles.note}>Main muscle counts 1 set, secondary muscles ½.</p>
+            <p className={styles.note}>{t.plan.weeklyNote}</p>
           </Panel>
           <ReviewPanel plan={plan} />
           <ProgressionTips />
@@ -80,7 +81,7 @@ export function PlanView({ plan }: { plan: Plan }) {
           onPick={(exId, scope) => {
             updatePlan(applySwap(plan, swap.dayIdx, swap.exIdx, exId, EXERCISES, scope));
             setSwap(null);
-            toast(`Swapped in ${EXERCISE_BY_ID.get(exId)?.name ?? exId}`);
+            toast(t.plan.swappedIn(exName(exId)));
           }}
         />
       )}

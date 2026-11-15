@@ -1,6 +1,7 @@
 import { EXERCISE_BY_ID } from "../../data/exercises.ts";
+import { useI18n } from "../../hooks/useI18n.ts";
 import { useRestTimer } from "../../hooks/useRestTimer.tsx";
-import { fmtDate, fmtRest, fmtSets } from "../../lib/format.ts";
+import { fmtRest, fmtSets } from "../../lib/format.ts";
 import { cue, type HistoryPoint } from "../../lib/progression.ts";
 import type { LoggedSet, PlanExercise, WorkoutDraft } from "../../lib/types.ts";
 import { Button } from "../common/Button.tsx";
@@ -24,6 +25,7 @@ interface Props {
 
 export function ExerciseLog({ entry, slot, date, unit, history, onChange, onInfo, onSwap }: Props) {
   const timer = useRestTimer();
+  const { t, exName, date: fmtDate } = useI18n();
   const ex = EXERCISE_BY_ID.get(entry.exId);
   if (!ex) return null;
   const before = history.filter((h) => h.date < date);
@@ -35,20 +37,20 @@ export function ExerciseLog({ entry, slot, date, unit, history, onChange, onInfo
     <article className={styles.card}>
       <div className={styles.head}>
         <div>
-          <Button variant="link" onClick={onInfo}><h3>{ex.name}</h3></Button>
+          <Button variant="link" onClick={onInfo}><h3>{exName(ex.id)}</h3></Button>
           <div className={styles.rx}>
-            {slot.sets} × {slot.reps[0]}–{slot.reps[1]} · {slot.rir}
-            {swapped && <> · <Chip>today instead of {EXERCISE_BY_ID.get(entry.plannedExId)?.name}</Chip></>}
+            {slot.sets} × {slot.reps[0]}–{slot.reps[1]} · {t.rir[slot.rir] ?? t.rir.compound}
+            {swapped && <> · <Chip>{t.workout.insteadOf(exName(entry.plannedExId))}</Chip></>}
           </div>
         </div>
         <div className={styles.tools}>
-          <Button variant="ghost" small onClick={() => timer.start(slot.rest)}>Rest {fmtRest(slot.rest)}</Button>
-          <Button variant="ghost" small onClick={onSwap}>Swap</Button>
+          <Button variant="ghost" small onClick={() => timer.start(slot.rest)}>{t.workout.rest(fmtRest(slot.rest))}</Button>
+          <Button variant="ghost" small onClick={onSwap}>{t.workout.swap}</Button>
         </div>
       </div>
       <div className={styles.meta}>
-        <span className={styles.muted}>{last ? `Last (${fmtDate(last.date)}): ${fmtSets(last.sets)}` : "No previous sets"}</span>
-        <Chip tone={CUE_TONE[next.kind]}>{next.text}</Chip>
+        <span className={styles.muted}>{last ? t.workout.last(fmtDate(last.date), fmtSets(last.sets, t.locale)) : t.workout.noPrevious}</span>
+        <Chip tone={CUE_TONE[next.kind]}>{t.workout.cue(next.kind, next)}</Chip>
       </div>
       <div className={styles.sets}>
         {entry.sets.map((s, i) => (
@@ -59,13 +61,13 @@ export function ExerciseLog({ entry, slot, date, unit, history, onChange, onInfo
             unit={unit}
             previous={last?.sets[i]}
             topReps={slot.reps[1]}
-            exerciseName={ex.name}
+            exerciseName={exName(ex.id)}
             onChange={(updated) => onChange(entry.sets.map((x, k) => (k === i ? updated : x)))}
           />
         ))}
       </div>
       <div>
-        <Button variant="link" small onClick={() => onChange([...entry.sets, { w: null, r: null, hurt: false }])}>+ Add a set</Button>
+        <Button variant="link" small onClick={() => onChange([...entry.sets, { w: null, r: null, hurt: false }])}>{t.workout.addSet}</Button>
       </div>
     </article>
   );

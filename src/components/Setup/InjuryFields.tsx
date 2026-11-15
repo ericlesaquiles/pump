@@ -1,4 +1,5 @@
-import { JOINTS, SEVERITY } from "../../lib/constants.ts";
+import { useI18n } from "../../hooks/useI18n.ts";
+import { JOINTS } from "../../lib/constants.ts";
 import type { Answers, Joint, Severity } from "../../lib/types.ts";
 import styles from "./InjuryFields.module.css";
 
@@ -9,6 +10,7 @@ interface Props {
 
 /** One severity dropdown per joint. */
 export function InjuryFields({ value, onChange }: Props) {
+  const { t } = useI18n();
   const set = (joint: Joint, sev: string) => {
     const next = { ...value };
     if (sev === "none") delete next[joint];
@@ -19,9 +21,9 @@ export function InjuryFields({ value, onChange }: Props) {
     <div className={styles.grid}>
       {(Object.keys(JOINTS) as Joint[]).map((j) => (
         <label key={j} className={styles.field}>
-          {JOINTS[j]}
+          {t.joints[j]}
           <select value={value[j] ?? "none"} onChange={(e) => set(j, e.target.value)}>
-            {Object.entries(SEVERITY).map(([k, label]) => <option key={k} value={k}>{label}</option>)}
+            {Object.entries(t.severity).map(([k, label]) => <option key={k} value={k}>{label}</option>)}
           </select>
         </label>
       ))}

@@ -1,7 +1,6 @@
 import { useMemo, useState } from "react";
-import { EXERCISES, EXERCISE_BY_ID } from "../../data/exercises.ts";
-import { MUSCLES } from "../../lib/constants.ts";
-import { fmtNum } from "../../lib/format.ts";
+import { EXERCISES } from "../../data/exercises.ts";
+import { useI18n } from "../../hooks/useI18n.ts";
 import { QUICK_FILTERS, swapCandidates, swapImpact, type QuickFilter, type SwapScope } from "../../lib/swap.ts";
 import type { Plan } from "../../lib/types.ts";
 import { Button } from "../common/Button.tsx";
@@ -9,8 +8,6 @@ import { Callout } from "../common/Callout.tsx";
 import { Dialog } from "../common/Dialog.tsx";
 import { OptionGroup } from "../common/OptionGroup.tsx";
 import styles from "./SwapDialog.module.css";
-
-const TIER_LABEL = { 1: "Same movement", 2: "Same muscle, different movement", 3: "Shifts the work to other muscles" } as const;
 
 interface Props {
   plan: Plan;
@@ -23,8 +20,8 @@ interface Props {
 }
 
 export function SwapDialog({ plan, dayIdx, exIdx, mode, onPick, onClose }: Props) {
+  const { t, exName, num } = useI18n();
   const slot = plan.days[dayIdx]?.exercises[exIdx];
-  const current = slot ? EXERCISE_BY_ID.get(slot.exId) : undefined;
   const [filter, setFilter] = useState<QuickFilter | "all">("all");
   const [scope, setScope] = useState<SwapScope>("plan");
   const candidates = useMemo(
@@ -35,33 +32,34 @@ export function SwapDialog({ plan, dayIdx, exIdx, mode, onPick, onClose }: Props
   const selected = picked && candidates.some((c) => c.ex.id === picked) ? picked : candidates[0]?.ex.id ?? null;
   const impact = useMemo(() => (mode === "plan" && selected ? swapImpact(plan, dayIdx, exIdx, selected, EXERCISES) : []), [mode, selected, plan, dayIdx, exIdx]);
 
-  if (!slot || !current) return null;
+  if (!slot) return null;
+  const currentName = exName(slot.exId);
   const warn = impact.filter((c) => c.belowFloor);
 
   return (
     <Dialog
-      eyebrow={mode === "today" ? "Swap for this workout only" : "Swap exercise"}
-      title={current.name}
-      closeLabel="Cancel"
+      eyebrow={mode === "today" ? t.swap.todayEyebrow : t.swap.planEyebrow}
+      title={currentName}
+      closeLabel={t.cancel}
       onClose={onClose}
-      footer={<Button disabled={!selected} onClick={() => selected && onPick(selected, scope)}>{mode === "today" ? "Use for today" : "Swap"}</Button>}
+      footer={<Button disabled={!selected} onClick={() => selected && onPick(selected, scope)}>{mode === "today" ? t.swap.useToday : t.swap.swap}</Button>}
     >
       <OptionGroup
-        label="Filter"
-        options={[{ value: "all", label: "All" }, ...Object.entries(QUICK_FILTERS).map(([k, f]) => ({ value: k as QuickFilter, label: f.label }))]}
+        label={t.swap.filter}
+        options={(["all", ...Object.keys(QUICK_FILTERS)] as (QuickFilter | "all")[]).map((k) => ({ value: k, label: t.swap.filters[k] }))}
         value={filter}
         onChange={setFilter}
       />
 
-      <div className={styles.list} role="radiogroup" aria-label="Replacement exercise">
-        {candidates.length === 0 && <p className={styles.muted}>Nothing fits this slot with that filter. Try another filter.</p>}
+      <div className={styles.list} role="radiogroup" aria-label={t.swap.listLabel}>
+        {candidates.length === 0 && <p className={styles.muted}>{t.swap.nothing}</p>}
         {candidates.map((c, i) => (
           <div key={c.ex.id} className={styles.group}>
-            {(i === 0 || candidates[i - 1]?.tier !== c.tier) && <div className={styles.tier}>{TIER_LABEL[c.tier]}</div>}
+            {(i === 0 || candidates[i - 1]?.tier !== c.tier) && <div className={styles.tier}>{t.swap.tiers[c.tier]}</div>}
             <label className={styles.cand}>
               <input type="radio" name="swap-candidate" checked={selected === c.ex.id} onChange={() => setPicked(c.ex.id)} />
-              <strong>{c.ex.name}</strong>
-              <small>{c.reason}</small>
+              <strong>{exName(c.ex.id)}</strong>
+              <small>{t.swap.reason(c.reason)}</small>
             </label>
           </div>
         ))}
@@ -72,27 +70,27 @@ export function SwapDialog({ plan, dayIdx, exIdx, mode, onPick, onClose }: Props
           <div className={styles.impact}>
             {impact.length ? (
               <>
-                <span className={styles.muted}>Weekly sets: </span>
-                {impact.map((c) => `${MUSCLES[c.muscle]} ${c.delta > 0 ? "+" : ""}${fmtNum(c.delta)}`).join(", ")}
+                <span className={styles.muted}>{t.swap.weeklySets}</span>
+                {impact.map((c) => `${t.muscles[c.muscle]} ${c.delta > 0 ? "+" : ""}${num(c.delta)}`).join(", ")}
               </>
             ) : (
-              <span className={styles.muted}>Weekly sets per muscle stay the same.</span>
+              <span className={styles.muted}>{t.swap.same}</span>
             )}
           </div>
           {warn.length > 0 && (
             <Callout tone="warn" small>
-              {warn.map((c) => `${MUSCLES[c.muscle]} would drop to ${fmtNum(c.after)} sets a week, below the minimum of ${plan.targets[c.muscle].floor}.`).join(" ")} You can add a set elsewhere or pick another option.
+              {warn.map((c) => t.swap.drop(t.muscles[c.muscle], num(c.after), plan.targets[c.muscle].floor)).join(" ")} {t.swap.dropHint}
             </Callout>
           )}
           <OptionGroup
-            label="Swap scope"
-            options={[{ value: "plan", label: "Rest of the plan" }, { value: "never", label: `Never suggest ${current.name} again` }]}
+            label={t.swap.scope}
+            options={[{ value: "plan", label: t.swap.scopePlan }, { value: "never", label: t.swap.scopeNever(currentName) }]}
             value={scope}
             onChange={setScope}
           />
         </>
       ) : (
-        <p className={styles.muted}>Your plan stays the same. The log records what you actually did.</p>
+        <p className={styles.muted}>{t.swap.todayNote}</p>
       )}
     </Dialog>
   );

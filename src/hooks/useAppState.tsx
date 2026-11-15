@@ -1,6 +1,6 @@
-import { createContext, useCallback, useContext, useMemo, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { EXERCISES } from "../data/exercises.ts";
-import { generatePlan } from "../lib/generator.ts";
+import { generatePlan, migratePlan } from "../lib/generator.ts";
 import { store } from "../lib/storage.ts";
 import { isoDate } from "../lib/format.ts";
 import { nextDayIdx } from "../lib/rotation.ts";
@@ -30,9 +30,18 @@ interface AppState {
 
 const Ctx = createContext<AppState | null>(null);
 
+/** The saved plan, upgraded (and re-saved) if an older version of the app wrote it. */
+function loadPlan(): Plan | null {
+  const saved = store.getPlan();
+  if (!saved || saved.v === 2) return saved;
+  const plan = migratePlan(saved, EXERCISES);
+  store.setPlan(plan);
+  return plan;
+}
+
 export function AppStateProvider({ children }: { children: ReactNode }) {
   const [answers, setAnswers] = useState<Answers | null>(() => store.getAnswers());
-  const [plan, setPlan] = useState<Plan | null>(() => store.getPlan());
+  const [plan, setPlan] = useState<Plan | null>(loadPlan);
   const [sessions, setSessions] = useState<Session[]>(() => store.getSessions());
   const [settings, setSettings] = useState<Settings>(() => store.getSettings());
   const [logSel, setLogSel] = useState<LogSelection | null>(null);
@@ -73,7 +82,7 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
 
   const reloadAll = useCallback(() => {
     setAnswers(store.getAnswers());
-    setPlan(store.getPlan());
+    setPlan(loadPlan());
     setSessions(store.getSessions());
     setSettings(store.getSettings());
     setLogSel(null);
@@ -88,6 +97,11 @@ export function AppStateProvider({ children }: { children: ReactNode }) {
     store.clearAll();
     reloadAll();
   }, [reloadAll]);
+
+  // Screen readers and the Android keyboard follow the page language.
+  useEffect(() => {
+    document.documentElement.lang = settings.lang === "pt" ? "pt-BR" : "en";
+  }, [settings.lang]);
 
   const value = useMemo<AppState>(() => ({
     answers, plan, sessions, settings, logSel,

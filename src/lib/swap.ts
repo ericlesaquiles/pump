@@ -1,27 +1,38 @@
 // Exercise swapping: reruns slot filling for one slot with the same filters.
-import { PATTERNS, MUSCLES, MUSCLE_KEYS, EQUIPMENT, JOINTS } from "./constants.ts";
+import { PATTERNS, MUSCLE_KEYS } from "./constants.ts";
 import { exclusionReason, scoreExercise, refreshPlan, indexExercises, weeklySets, getEx } from "./generator.ts";
-import type { Equipment, Exercise, Joint, Muscle, Plan } from "./types.ts";
-
-const EQUIP_WORDS: Record<Equipment, string> = {
-  barbell: "a barbell", dumbbell: "dumbbells", cable: "a cable", machine: "a machine", bands: "bands",
-  kettlebell: "a kettlebell", pullup_bar: "a pull-up bar", dip_bars: "dip bars", bench: "a bench", rack: "a rack",
-};
+import type { Equipment, Exercise, Joint, Muscle, Pattern, Plan } from "./types.ts";
 
 const onlyFrom = (ex: Exercise, allowed: string[]) => ex.equipment.every((i) => i.split("|").some((e) => allowed.includes(e)));
 
 export type QuickFilter = "dumbbells" | "no_bench" | "machines";
-export const QUICK_FILTERS: Record<QuickFilter, { label: string; test: (ex: Exercise) => boolean }> = {
-  dumbbells: { label: "Dumbbells only", test: (ex) => onlyFrom(ex, ["dumbbell", "bench"]) },
-  no_bench: { label: "No bench", test: (ex) => !ex.equipment.includes("bench") },
-  machines: { label: "Machines and cables", test: (ex) => ex.equipment.length > 0 && onlyFrom(ex, ["machine", "cable"]) },
+export const QUICK_FILTERS: Record<QuickFilter, (ex: Exercise) => boolean> = {
+  dumbbells: (ex) => onlyFrom(ex, ["dumbbell", "bench"]),
+  no_bench: (ex) => !ex.equipment.includes("bench"),
+  machines: (ex) => ex.equipment.length > 0 && onlyFrom(ex, ["machine", "cable"]),
 };
 
-function equipmentPhrase(ex: Exercise): string {
-  const items = ex.equipment.filter((i) => i !== "bench" && i !== "rack");
-  const first = items[0];
-  if (!first) return ex.equipment.length ? "uses a bench" : "needs no equipment";
-  return `uses ${first.split("|").map((e) => EQUIP_WORDS[e as Equipment] ?? EQUIPMENT[e as Equipment]).join(" or ")}`;
+/** What equipment a candidate needs, for "same movement, uses dumbbells". */
+export type EquipmentNeed = { kind: "none" } | { kind: "bench" } | { kind: "uses"; items: Equipment[] };
+
+export function equipmentNeed(ex: Exercise): EquipmentNeed {
+  const first = ex.equipment.filter((i) => i !== "bench" && i !== "rack")[0];
+  if (!first) return ex.equipment.length ? { kind: "bench" } : { kind: "none" };
+  return { kind: "uses", items: first.split("|") as Equipment[] };
+}
+
+/** Why a candidate is offered, as data for the UI to phrase. */
+export interface SwapReason {
+  tier: 1 | 2 | 3;
+  equipment: EquipmentNeed;
+  /** The candidate's own movement pattern (tier 2). */
+  pattern: Pattern;
+  /** The slot's main muscle (tier 3). */
+  main: Muscle;
+  /** Limited joints this candidate loads less than the current exercise. */
+  easier: Joint[];
+  /** Another muscle that gets clearly more work. */
+  more: Muscle | null;
 }
 
 export interface SwapCandidate {
@@ -29,7 +40,7 @@ export interface SwapCandidate {
   /** 1 = same movement, 2 = same main muscle, different movement, 3 = shifts the muscle mix. */
   tier: 1 | 2 | 3;
   score: number;
-  reason: string;
+  reason: SwapReason;
   shift: Muscle | null;
 }
 
@@ -51,7 +62,7 @@ export function swapCandidates(plan: Plan, dayIdx: number, exIdx: number, exerci
     const mainWeight = ex.muscles[pat.main] ?? 0;
     if (!pats.includes(ex.pattern) && mainWeight < 1) continue;
     if (exclusionReason(ex, answers)) continue;
-    if (filter && !QUICK_FILTERS[filter].test(ex)) continue;
+    if (filter && !QUICK_FILTERS[filter](ex)) continue;
 
     const samePattern = ex.pattern === slot.pattern;
     const sameType = ex.type === current.type;
@@ -63,15 +74,13 @@ export function swapCandidates(plan: Plan, dayIdx: number, exIdx: number, exerci
       if (m !== pat.main && w > (current.muscles[m] ?? 0) && w >= 0.5 && (!shift || w > shift.w)) shift = { m, w };
     }
 
-    const reasons: string[] = [];
-    if (tier === 1) reasons.push(`Same movement, ${equipmentPhrase(ex)}`);
-    else if (tier === 2) reasons.push(`Different movement (${PATTERNS[ex.pattern].label.toLowerCase()}), same main muscle`);
-    else reasons.push(`Trains ${MUSCLES[pat.main].toLowerCase()} less directly`);
     const easier = (Object.keys(answers.injuries) as Joint[]).filter((j) => (ex.joints[j] ?? 0) < (current.joints[j] ?? 0));
-    if (easier.length) reasons.push(`easier on your ${easier.map((j) => JOINTS[j].toLowerCase()).join(" and ")}`);
-    if (shift && (tier > 1 || shift.w >= 1)) reasons.push(`more ${MUSCLES[shift.m].toLowerCase()} work`);
+    const reason: SwapReason = {
+      tier, equipment: equipmentNeed(ex), pattern: ex.pattern, main: pat.main, easier,
+      more: shift && (tier > 1 || shift.w >= 1) ? shift.m : null,
+    };
 
-    out.push({ ex, tier, score: scoreExercise(ex, slot.pattern, answers), reason: reasons.join("; "), shift: shift?.m ?? null });
+    out.push({ ex, tier, score: scoreExercise(ex, slot.pattern, answers), reason, shift: shift?.m ?? null });
   }
   out.sort((a, b) => a.tier - b.tier || b.score - a.score || a.ex.order - b.ex.order);
   return out;
@@ -100,20 +109,18 @@ export type SwapScope = "plan" | "never";
  * "never" also adds the old exercise to the skip list and replaces it everywhere.
  */
 export function applySwap(plan: Plan, dayIdx: number, exIdx: number, newId: string, exercises: Exercise[], scope: SwapScope = "plan"): Plan {
-  const byId = indexExercises(exercises);
   const next = structuredClone(plan);
   const slot = next.days[dayIdx]?.exercises[exIdx];
   if (!slot) return next;
   const oldId = slot.exId;
-  const oldName = byId.get(oldId)?.name ?? oldId;
   slot.exId = newId;
-  slot.reasons = [`Swapped in by you (replaced ${oldName}).`];
+  slot.reasons = [{ k: "reason.swapped", ex: oldId }];
   if (scope === "never" && !next.answers.dislikes.includes(oldId)) {
     next.answers.dislikes.push(oldId);
     next.days.forEach((d, di) => d.exercises.forEach((s, si) => {
       if (s.exId !== oldId) return;
       const alt = swapCandidates(next, di, si, exercises)[0];
-      if (alt) { s.exId = alt.ex.id; s.reasons = [`Replaced ${oldName}, which you chose to skip.`]; }
+      if (alt) { s.exId = alt.ex.id; s.reasons = [{ k: "reason.replacedSkipped", ex: oldId }]; }
     }));
   }
   return refreshPlan(next, exercises);
