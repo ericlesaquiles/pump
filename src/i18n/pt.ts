@@ -298,6 +298,7 @@ export const pt: Dict = {
     videoQuery: "execução",
     needsNet: "(precisa de internet)",
     credit: "Instruções do free-exercise-db (domínio público), traduzidas pelo Pump. Classificação dos exercícios pelo Pump.",
+    gifAlt: (name: string) => `Animação: ${name}`,
     or: (items: string[]) => or(items),
     sparkSingle: (date: string, w: string, unit: string) => `${date}: ${w} ${unit}`,
     sparkLabel: (from: string, to: string, unit: string) => `Melhor série de ${from} para ${to} ${unit}`,

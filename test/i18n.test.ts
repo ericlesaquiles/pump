@@ -104,3 +104,12 @@ test("the review input follows the chosen language", () => {
   assert.equal(input.days[0]!.day, "Treino A · Corpo inteiro");
   assert.ok(input.weeklySetsPerMuscle["Peito"]);
 });
+
+test("the GIF map only points at known exercises and dataset files", async () => {
+  const { map } = (await import("../data/gif-map.json")).default as { map: Record<string, { id: string; file: string }> };
+  const ids = new Set(db.map((e) => e.id));
+  for (const [exId, g] of Object.entries(map)) {
+    assert.ok(ids.has(exId), `${exId} isn't a Pump exercise`);
+    assert.match(g.file, new RegExp(`^${g.id}-[A-Za-z0-9]+\\.gif$`), exId);
+  }
+});

@@ -214,6 +214,7 @@ export const en = {
     videoQuery: "exercise technique",
     needsNet: "(needs internet)",
     credit: "Instructions from free-exercise-db (public domain). Exercise tags by Pump.",
+    gifAlt: (name: string) => `Animation of ${name}`,
     or: (items: string[]) => or(items),
     sparkSingle: (date: string, w: string, unit: string) => `${date}: ${w} ${unit}`,
     sparkLabel: (from: string, to: string, unit: string) => `Top set from ${from} to ${to} ${unit}`,

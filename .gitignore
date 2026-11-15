@@ -1,3 +1,6 @@
+# Exercise GIFs (© Gym visual): personal use only, never commit (see scripts/fetch-gifs.ts)
+public/media/gymvisual/
+
 # Dependencies
 node_modules/
 

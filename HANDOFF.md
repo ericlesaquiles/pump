@@ -49,7 +49,7 @@ React 19.3.1 · TypeScript 7.0.2 (strict, `noUncheckedIndexedAccess`) · Vite 8.
 - Keep plan logic in `src/lib/` free of React so it can be reused (tests, a future native app).
 - AI review must stay **optional** and the app must work fully **offline** without it.
 - Base exercise data: free-exercise-db text (public domain). Do **not** use its photos in a shared app (ownership unclear).
-- Do **not** use the Gym visual GIFs from hasaneyldrm/exercises-dataset, and don't trace or AI-generate from them. Their terms make the free versions "entirely copyrighted" and licenses non-transferable. Plan instead: own animations (film → MediaPipe pose → SVG stick figures, ~30–60 per movement pattern) plus YouTube links (kinetic-place/exercises-db has 906/908 linked; quality varies, hand-check).
+- **Exercise GIFs (Gym visual), personal use only (user's decision, 2026-11-15).** The GIFs from hasaneyldrm/exercises-dataset are © Gym visual and not covered by that repo's MIT license ("Cloning this repository does not grant you any license to the media"); Gym visual's own terms couldn't be read (their site returned 403). The user chose to use them for personal use on their own phone. So: the mapping (`data/gif-map.json`, ids and names only) is in git; the GIFs are downloaded by `npm run fetch:gifs` into `public/media/gymvisual/`, which is **git-ignored**; the app shows a GIF only if that folder exists, always with "© Gym visual — gymvisual.com". **Any build that will be shared or published must use `PUMP_NO_GIFS=1`** (drops the folder from `dist/`) unless a license is bought. Don't trace or AI-generate from the GIFs. Long-term plan for a public app is unchanged: own animations (film → MediaPipe pose → SVG stick figures) plus YouTube links.
 - **Language:** Brazilian Portuguese and English, switchable in Settings (defaults to the phone's language). All text goes through `src/i18n/`; never hard-code UI text in components.
 - **No fixed weekdays:** workouts rotate (A, B, C…) and are done on whichever days suit the user; the app suggests the next one and tracks training days on a calendar.
 - Preferred route to Android: **Capacitor** (reuse ~95% of the code). Approved and built.
@@ -110,7 +110,7 @@ Time model, caps and weights live in `LIMITS` at the top of `generator.ts`.
 
 Capacitor wraps the same React build. App id `app.pump.planner` (in `capacitor.config.ts`; **can't change after publishing on Google Play** — pick the final id before the first upload). minSdk 24, targetSdk 36. Requires a full **JDK 21** (`openjdk-21-jdk-headless`, installed; the plugins ask for a Java 21 toolchain, so Android Studio's bundled JDK 25 doesn't work) and the Android SDK at `~/Android/Sdk` (`android/local.properties`, git-ignored). Gradle downloads platform 36 and build-tools 35 itself. All Capacitor packages are on v8 (`@capacitor/preferences` was moved from 7.0.4 to 8.0.1).
 
-Commands: `npm run android:sync` (build web app + copy into `android/`), `npm run android:open` (open in Android Studio), `npm run android:apk` (debug APK via Gradle, at `android/app/build/outputs/apk/debug/`).
+Commands (run `npm run fetch:gifs` first if you want exercise GIFs in the build; set `PUMP_NO_GIFS=1` for anything shared): `npm run android:sync` (build web app + copy into `android/`), `npm run android:open` (open in Android Studio), `npm run android:apk` (debug APK via Gradle, at `android/app/build/outputs/apk/debug/`).
 
 Native code lives in `src/lib/native.ts` (everything there is a no-op in the browser) and `src/lib/platform.ts` (`isNative`):
 

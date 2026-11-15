@@ -19,3 +19,19 @@
 .small { font-size: 0.88rem; }
 .muted { color: var(--muted); }
 .credit { font-size: 0.8rem; color: var(--muted); }
+
+/* Exercise GIF (© Gym visual). Drawn on white: the animations have a white background. */
+.gif {
+  margin: 0;
+  display: grid;
+  justify-items: center;
+  gap: 4px;
+}
+.gif img {
+  width: 180px;
+  height: 180px;
+  background: #ffffff;
+  border-radius: var(--r-sm);
+  border: 1px solid var(--line);
+}
+.gif figcaption { font-size: 0.72rem; color: var(--muted); }

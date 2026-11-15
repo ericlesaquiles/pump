@@ -1,0 +1,590 @@
+{
+ "source": "Exercise ids and names from hasaneyldrm/exercises-dataset (data: MIT). The GIFs themselves are © Gym visual (https://gymvisual.com/) and are NOT in this repository; see scripts/fetch-gifs.ts.",
+ "map": {
+  "Barbell_Bench_Press_-_Medium_Grip": {
+   "id": "0025",
+   "name": "barbell bench press",
+   "file": "0025-EIeI8Vf.gif"
+  },
+  "Dumbbell_Bench_Press": {
+   "id": "0289",
+   "name": "dumbbell bench press",
+   "file": "0289-SpYC0Kp.gif"
+  },
+  "Dumbbell_Bench_Press_with_Neutral_Grip": {
+   "id": "0352",
+   "name": "dumbbell neutral grip bench press",
+   "file": "0352-pP8wP2P.gif"
+  },
+  "Machine_Bench_Press": {
+   "id": "0577",
+   "name": "lever chest press",
+   "file": "0577-T0yTjgW.gif"
+  },
+  "Smith_Machine_Bench_Press": {
+   "id": "0748",
+   "name": "smith bench press",
+   "file": "0748-trqKQv2.gif"
+  },
+  "Pushups": {
+   "id": "0662",
+   "name": "push-up",
+   "file": "0662-I4hDWkc.gif"
+  },
+  "Push-Ups_With_Feet_Elevated": {
+   "id": "0279",
+   "name": "decline push-up",
+   "file": "0279-i5cEhka.gif"
+  },
+  "Bench_Press_-_With_Bands": {
+   "id": "1254",
+   "name": "band bench press",
+   "file": "1254-khlHMqs.gif"
+  },
+  "Dips_-_Chest_Version": {
+   "id": "0251",
+   "name": "chest dip",
+   "file": "0251-9WTm7dq.gif"
+  },
+  "Close-Grip_Barbell_Bench_Press": {
+   "id": "0030",
+   "name": "barbell close-grip bench press",
+   "file": "0030-J6Dx1Mu.gif"
+  },
+  "Barbell_Incline_Bench_Press_-_Medium_Grip": {
+   "id": "0047",
+   "name": "barbell incline bench press",
+   "file": "0047-3TZduzM.gif"
+  },
+  "Incline_Dumbbell_Press": {
+   "id": "0314",
+   "name": "dumbbell incline bench press",
+   "file": "0314-ns0SIbU.gif"
+  },
+  "Incline_Dumbbell_Bench_With_Palms_Facing_In": {
+   "id": "1623",
+   "name": "dumbbell palms in incline bench press",
+   "file": "1623-8eqjhOl.gif"
+  },
+  "Leverage_Incline_Chest_Press": {
+   "id": "1299",
+   "name": "lever incline chest press",
+   "file": "1299-jHAnWmT.gif"
+  },
+  "Smith_Machine_Incline_Bench_Press": {
+   "id": "0757",
+   "name": "smith incline bench press",
+   "file": "0757-5v7KYld.gif"
+  },
+  "Incline_Cable_Chest_Press": {
+   "id": "0169",
+   "name": "cable incline bench press",
+   "file": "0169-Vh0GsK4.gif"
+  },
+  "Incline_Push-Up": {
+   "id": "0493",
+   "name": "incline push-up",
+   "file": "0493-B1EVP9F.gif"
+  },
+  "Standing_Military_Press": {
+   "id": "1456",
+   "name": "barbell standing close grip military press",
+   "file": "1456-wdRZISl.gif"
+  },
+  "Seated_Barbell_Military_Press": {
+   "id": "0091",
+   "name": "barbell seated overhead press",
+   "file": "0091-kTbSH9h.gif"
+  },
+  "Dumbbell_Shoulder_Press": {
+   "id": "0405",
+   "name": "dumbbell seated shoulder press",
+   "file": "0405-znQUdHY.gif"
+  },
+  "Arnold_Dumbbell_Press": {
+   "id": "2137",
+   "name": "dumbbell arnold press",
+   "file": "2137-Xy4jlWA.gif"
+  },
+  "Machine_Shoulder_Military_Press": {
+   "id": "0603",
+   "name": "lever shoulder press",
+   "file": "0603-67n3r98.gif"
+  },
+  "Shoulder_Press_-_With_Bands": {
+   "id": "0997",
+   "name": "band shoulder press",
+   "file": "0997-peAeMR3.gif"
+  },
+  "Two-Arm_Kettlebell_Military_Press": {
+   "id": "0553",
+   "name": "kettlebell two arm military press",
+   "file": "0553-blBXysN.gif"
+  },
+  "Cable_Crossover": {
+   "id": "0155",
+   "name": "cable cross-over variation",
+   "file": "0155-0CXGHya.gif"
+  },
+  "Low_Cable_Crossover": {
+   "id": "0179",
+   "name": "cable low fly",
+   "file": "0179-FVmZVhk.gif"
+  },
+  "Butterfly": {
+   "id": "0596",
+   "name": "lever seated fly",
+   "file": "0596-v3xmPAR.gif"
+  },
+  "Dumbbell_Flyes": {
+   "id": "0308",
+   "name": "dumbbell fly",
+   "file": "0308-yz9nUhF.gif"
+  },
+  "Incline_Cable_Flye": {
+   "id": "0171",
+   "name": "cable incline fly",
+   "file": "0171-tBWXbIT.gif"
+  },
+  "Triceps_Pushdown": {
+   "id": "0201",
+   "name": "cable pushdown",
+   "file": "0201-3ZflifB.gif"
+  },
+  "Triceps_Pushdown_-_Rope_Attachment": {
+   "id": "0200",
+   "name": "cable pushdown (with rope attachment)",
+   "file": "0200-dU605di.gif"
+  },
+  "Cable_Rope_Overhead_Triceps_Extension": {
+   "id": "0194",
+   "name": "cable overhead triceps extension (rope attachment)",
+   "file": "0194-2IxROQ1.gif"
+  },
+  "Standing_Dumbbell_Triceps_Extension": {
+   "id": "0430",
+   "name": "dumbbell standing triceps extension",
+   "file": "0430-PdmaD0N.gif"
+  },
+  "EZ-Bar_Skullcrusher": {
+   "id": "0060",
+   "name": "barbell lying triceps extension skull crusher",
+   "file": "0060-h8LFzo9.gif"
+  },
+  "Tricep_Dumbbell_Kickback": {
+   "id": "0333",
+   "name": "dumbbell kickback",
+   "file": "0333-W6PxUkg.gif"
+  },
+  "Machine_Triceps_Extension": {
+   "id": "0607",
+   "name": "lever triceps extension",
+   "file": "0607-Ser9eQp.gif"
+  },
+  "Dips_-_Triceps_Version": {
+   "id": "0814",
+   "name": "triceps dip",
+   "file": "0814-X6C6i5Y.gif"
+  },
+  "Bench_Dips": {
+   "id": "0129",
+   "name": "bench dip (knees bent)",
+   "file": "0129-RrLske5.gif"
+  },
+  "Bent_Over_Barbell_Row": {
+   "id": "0027",
+   "name": "barbell bent over row",
+   "file": "0027-eZyBC3j.gif"
+  },
+  "Seated_Cable_Rows": {
+   "id": "0861",
+   "name": "cable seated row",
+   "file": "0861-fUBheHs.gif"
+  },
+  "One-Arm_Dumbbell_Row": {
+   "id": "0292",
+   "name": "dumbbell one arm bent-over row",
+   "file": "0292-C0MA9bC.gif"
+  },
+  "Dumbbell_Incline_Row": {
+   "id": "0327",
+   "name": "dumbbell incline row",
+   "file": "0327-7vG5o25.gif"
+  },
+  "Leverage_Iso_Row": {
+   "id": "1350",
+   "name": "lever seated row",
+   "file": "1350-7I6LNUG.gif"
+  },
+  "T-Bar_Row_with_Handle": {
+   "id": "0606",
+   "name": "lever t bar row",
+   "file": "0606-aaXr7ld.gif"
+  },
+  "Bent_Over_Two-Dumbbell_Row": {
+   "id": "0293",
+   "name": "dumbbell bent over row",
+   "file": "0293-BJ0Hz5L.gif"
+  },
+  "Inverted_Row": {
+   "id": "0499",
+   "name": "inverted row",
+   "file": "0499-bZGHsAZ.gif"
+  },
+  "Two-Arm_Kettlebell_Row": {
+   "id": "1345",
+   "name": "kettlebell two arm row",
+   "file": "1345-wf24o8S.gif"
+  },
+  "Wide-Grip_Lat_Pulldown": {
+   "id": "0150",
+   "name": "cable bar lateral pulldown",
+   "file": "0150-eYnzaCm.gif"
+  },
+  "Close-Grip_Front_Lat_Pulldown": {
+   "id": "0818",
+   "name": "twin handle parallel grip lat pulldown",
+   "file": "0818-rkg41Fb.gif"
+  },
+  "Underhand_Cable_Pulldowns": {
+   "id": "0245",
+   "name": "cable underhand pulldown",
+   "file": "0245-xBYcQHj.gif"
+  },
+  "Pullups": {
+   "id": "0652",
+   "name": "pull-up",
+   "file": "0652-lBDjFxJ.gif"
+  },
+  "Chin-Up": {
+   "id": "1326",
+   "name": "chin-up",
+   "file": "1326-T2mxWqc.gif"
+  },
+  "Band_Assisted_Pull-Up": {
+   "id": "0970",
+   "name": "band assisted pull-up",
+   "file": "0970-r1XNRYB.gif"
+  },
+  "One_Arm_Lat_Pulldown": {
+   "id": "3563",
+   "name": "cable one arm pulldown",
+   "file": "3563-U5INZY6.gif"
+  },
+  "Straight-Arm_Pulldown": {
+   "id": "0238",
+   "name": "cable straight arm pulldown",
+   "file": "0238-x69MAlq.gif"
+  },
+  "Face_Pull": {
+   "id": "0203",
+   "name": "cable rear delt row (with rope)",
+   "file": "0203-wqNPGCg.gif"
+  },
+  "Reverse_Machine_Flyes": {
+   "id": "0602",
+   "name": "lever seated reverse fly",
+   "file": "0602-myfUsKf.gif"
+  },
+  "Cable_Rear_Delt_Fly": {
+   "id": "0154",
+   "name": "cable cross-over revers fly",
+   "file": "0154-aqvSOQE.gif"
+  },
+  "Reverse_Flyes": {
+   "id": "0383",
+   "name": "dumbbell reverse fly",
+   "file": "0383-EAs3xL9.gif"
+  },
+  "Seated_Bent-Over_Rear_Delt_Raise": {
+   "id": "0378",
+   "name": "dumbbell rear fly",
+   "file": "0378-8DiFDVA.gif"
+  },
+  "Back_Flyes_-_With_Bands": {
+   "id": "0993",
+   "name": "band reverse fly",
+   "file": "0993-sTfvVsG.gif"
+  },
+  "Side_Lateral_Raise": {
+   "id": "0334",
+   "name": "dumbbell lateral raise",
+   "file": "0334-DsgkuIt.gif"
+  },
+  "Cable_Seated_Lateral_Raise": {
+   "id": "0178",
+   "name": "cable lateral raise",
+   "file": "0178-goJ6ezq.gif"
+  },
+  "One-Arm_Side_Laterals": {
+   "id": "0355",
+   "name": "dumbbell one arm lateral raise",
+   "file": "0355-n5cWCsI.gif"
+  },
+  "Barbell_Curl": {
+   "id": "0031",
+   "name": "barbell curl",
+   "file": "0031-25GPyDY.gif"
+  },
+  "EZ-Bar_Curl": {
+   "id": "0447",
+   "name": "ez barbell curl",
+   "file": "0447-6TG6x2w.gif"
+  },
+  "Dumbbell_Bicep_Curl": {
+   "id": "0294",
+   "name": "dumbbell biceps curl",
+   "file": "0294-NbVPDMW.gif"
+  },
+  "Hammer_Curls": {
+   "id": "0313",
+   "name": "dumbbell hammer curl",
+   "file": "0313-slDvUAU.gif"
+  },
+  "Incline_Dumbbell_Curl": {
+   "id": "0318",
+   "name": "dumbbell incline curl",
+   "file": "0318-ae9UoXQ.gif"
+  },
+  "Standing_Biceps_Cable_Curl": {
+   "id": "0868",
+   "name": "cable curl",
+   "file": "0868-G08RZcQ.gif"
+  },
+  "Cable_Hammer_Curls_-_Rope_Attachment": {
+   "id": "0165",
+   "name": "cable hammer curl (with rope)",
+   "file": "0165-HPlPoQA.gif"
+  },
+  "Preacher_Curl": {
+   "id": "0070",
+   "name": "barbell preacher curl",
+   "file": "0070-qOgPVf6.gif"
+  },
+  "Machine_Preacher_Curls": {
+   "id": "0592",
+   "name": "lever preacher curl",
+   "file": "0592-b6hQYMb.gif"
+  },
+  "Close-Grip_EZ-Bar_Curl_with_Band": {
+   "id": "0968",
+   "name": "band alternating biceps curl",
+   "file": "0968-3omWx6P.gif"
+  },
+  "Barbell_Squat": {
+   "id": "0043",
+   "name": "barbell full squat",
+   "file": "0043-qXTaZnJ.gif"
+  },
+  "Front_Barbell_Squat": {
+   "id": "0042",
+   "name": "barbell front squat",
+   "file": "0042-zG0zs85.gif"
+  },
+  "Box_Squat": {
+   "id": "0026",
+   "name": "barbell bench squat",
+   "file": "0026-W9pFVv1.gif"
+  },
+  "Leg_Press": {
+   "id": "0739",
+   "name": "sled 45в° leg press",
+   "file": "0739-10Z2DXU.gif"
+  },
+  "Hack_Squat": {
+   "id": "0743",
+   "name": "sled hack squat",
+   "file": "0743-Qa55kX1.gif"
+  },
+  "Smith_Machine_Squat": {
+   "id": "0770",
+   "name": "smith squat",
+   "file": "0770-jFtipLl.gif"
+  },
+  "Goblet_Squat": {
+   "id": "1760",
+   "name": "dumbbell goblet squat",
+   "file": "1760-yn8yg1r.gif"
+  },
+  "Dumbbell_Squat": {
+   "id": "0413",
+   "name": "dumbbell squat",
+   "file": "0413-HsvHqgf.gif"
+  },
+  "Squats_-_With_Bands": {
+   "id": "1004",
+   "name": "band squat",
+   "file": "1004-TUZLh71.gif"
+  },
+  "Split_Squat_with_Dumbbells": {
+   "id": "0410",
+   "name": "dumbbell single leg split squat",
+   "file": "0410-qx4fgX7.gif"
+  },
+  "Dumbbell_Rear_Lunge": {
+   "id": "0381",
+   "name": "dumbbell rear lunge",
+   "file": "0381-SSsBDwB.gif"
+  },
+  "Dumbbell_Lunges": {
+   "id": "0336",
+   "name": "dumbbell lunge",
+   "file": "0336-RRWFUcw.gif"
+  },
+  "Barbell_Lunge": {
+   "id": "0054",
+   "name": "barbell lunge",
+   "file": "0054-t8iSghb.gif"
+  },
+  "Smith_Single-Leg_Split_Squat": {
+   "id": "0768",
+   "name": "smith single leg split squat",
+   "file": "0768-wWFspEi.gif"
+  },
+  "Bodyweight_Walking_Lunge": {
+   "id": "1460",
+   "name": "walking lunge",
+   "file": "1460-IZVHb27.gif"
+  },
+  "Romanian_Deadlift": {
+   "id": "0085",
+   "name": "barbell romanian deadlift",
+   "file": "0085-wQ2c4XD.gif"
+  },
+  "Stiff-Legged_Dumbbell_Deadlift": {
+   "id": "1459",
+   "name": "dumbbell romanian deadlift",
+   "file": "1459-rR0LJzx.gif"
+  },
+  "Barbell_Deadlift": {
+   "id": "0032",
+   "name": "barbell deadlift",
+   "file": "0032-ila4NZS.gif"
+  },
+  "Good_Morning": {
+   "id": "0044",
+   "name": "barbell good morning",
+   "file": "0044-XlZ4lAC.gif"
+  },
+  "Kettlebell_One-Legged_Deadlift": {
+   "id": "1757",
+   "name": "dumbbell single leg deadlift",
+   "file": "1757-gKozT8X.gif"
+  },
+  "Hyperextensions_Back_Extensions": {
+   "id": "0489",
+   "name": "hyperextension",
+   "file": "0489-zhMwOwE.gif"
+  },
+  "Barbell_Hip_Thrust": {
+   "id": "1409",
+   "name": "barbell glute bridge",
+   "file": "1409-qKBpF7I.gif"
+  },
+  "Barbell_Glute_Bridge": {
+   "id": "1409",
+   "name": "barbell glute bridge",
+   "file": "1409-qKBpF7I.gif"
+  },
+  "Single_Leg_Glute_Bridge": {
+   "id": "3645",
+   "name": "single leg bridge with outstretched leg",
+   "file": "3645-rmEukuS.gif"
+  },
+  "Hip_Extension_with_Bands": {
+   "id": "0980",
+   "name": "band bent-over hip extension",
+   "file": "0980-wSScovH.gif"
+  },
+  "Leg_Extensions": {
+   "id": "0585",
+   "name": "lever leg extension",
+   "file": "0585-my33uHU.gif"
+  },
+  "Single-Leg_Leg_Extension": {
+   "id": "0585",
+   "name": "lever leg extension",
+   "file": "0585-my33uHU.gif"
+  },
+  "Lying_Leg_Curls": {
+   "id": "0586",
+   "name": "lever lying leg curl",
+   "file": "0586-17lJ1kr.gif"
+  },
+  "Seated_Leg_Curl": {
+   "id": "0599",
+   "name": "lever seated leg curl",
+   "file": "0599-Zg3XY7P.gif"
+  },
+  "Standing_Calf_Raises": {
+   "id": "0605",
+   "name": "lever standing calf raise",
+   "file": "0605-ykUOVze.gif"
+  },
+  "Seated_Calf_Raise": {
+   "id": "0594",
+   "name": "lever seated calf raise",
+   "file": "0594-bOOdeyc.gif"
+  },
+  "Calf_Press_On_The_Leg_Press_Machine": {
+   "id": "1391",
+   "name": "sled calf press on leg press",
+   "file": "1391-ykHcWme.gif"
+  },
+  "Smith_Machine_Calf_Raise": {
+   "id": "0773",
+   "name": "smith standing leg calf raise",
+   "file": "0773-6MaEjVA.gif"
+  },
+  "Standing_Dumbbell_Calf_Raise": {
+   "id": "0417",
+   "name": "dumbbell standing calf raise",
+   "file": "0417-dPmaUaU.gif"
+  },
+  "Calf_Raises_-_With_Bands": {
+   "id": "1369",
+   "name": "band two legs calf raise - (band under both legs) v. 2",
+   "file": "1369-jl6uxZV.gif"
+  },
+  "Cable_Crunch": {
+   "id": "0175",
+   "name": "cable kneeling crunch",
+   "file": "0175-WW95auq.gif"
+  },
+  "Hanging_Leg_Raise": {
+   "id": "0472",
+   "name": "hanging leg raise",
+   "file": "0472-I3tsCnC.gif"
+  },
+  "Ab_Crunch_Machine": {
+   "id": "1452",
+   "name": "lever seated crunch",
+   "file": "1452-Wgaz7pm.gif"
+  },
+  "Pallof_Press": {
+   "id": "0979",
+   "name": "band horizontal pallof press",
+   "file": "0979-9pa4H5m.gif"
+  },
+  "Crunches": {
+   "id": "0274",
+   "name": "crunch floor",
+   "file": "0274-TFqbd8t.gif"
+  },
+  "Reverse_Crunch": {
+   "id": "0872",
+   "name": "reverse crunch",
+   "file": "0872-nCU1Ekp.gif"
+  },
+  "Flat_Bench_Lying_Leg_Raise": {
+   "id": "0620",
+   "name": "lying leg raise flat bench",
+   "file": "0620-WhuFnR7.gif"
+  },
+  "Barbell_Ab_Rollout": {
+   "id": "0084",
+   "name": "barbell rollerout",
+   "file": "0084-7M66AVi.gif"
+  }
+ }
+}

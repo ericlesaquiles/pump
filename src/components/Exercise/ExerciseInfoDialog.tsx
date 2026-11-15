@@ -1,5 +1,6 @@
 import { EXERCISE_BY_ID } from "../../data/exercises.ts";
 import { useAppState } from "../../hooks/useAppState.tsx";
+import { useExerciseGif } from "../../hooks/useExerciseGif.ts";
 import { useI18n } from "../../hooks/useI18n.ts";
 import { historyFor, topSetSeries } from "../../lib/progression.ts";
 import type { Equipment, Joint, Muscle } from "../../lib/types.ts";
@@ -11,6 +12,7 @@ import styles from "./ExerciseInfoDialog.module.css";
 export function ExerciseInfoDialog({ exId, onClose }: { exId: string; onClose: () => void }) {
   const { sessions } = useAppState();
   const { t, ex: local } = useI18n();
+  const gif = useExerciseGif(exId);
   const ex = EXERCISE_BY_ID.get(exId);
   const text = local(exId);
   if (!ex || !text) return null;
@@ -29,6 +31,12 @@ export function ExerciseInfoDialog({ exId, onClose }: { exId: string; onClose: (
 
   return (
     <Dialog eyebrow={`${t.patterns[ex.pattern]} · ${t.exType[ex.type]} · ${t.skill[ex.skill]}`} title={text.name} onClose={onClose}>
+      {gif && (
+        <figure className={styles.gif}>
+          <img src={gif} width={180} height={180} alt={t.exercise.gifAlt(text.name)} />
+          <figcaption>© Gym visual — <a href="https://gymvisual.com/" target="_blank" rel="noopener noreferrer">gymvisual.com</a></figcaption>
+        </figure>
+      )}
       <dl className={styles.kv}>
         <dt>{t.exercise.muscles}</dt><dd>{muscles}</dd>
         <dt>{t.exercise.equipment}</dt><dd>{equipment}</dd>

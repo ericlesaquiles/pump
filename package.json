@@ -10,6 +10,7 @@
     "preview": "vite preview",
     "typecheck": "tsc --noEmit",
     "build:data": "node scripts/build-data.ts",
+    "fetch:gifs": "node scripts/fetch-gifs.ts",
     "test": "vitest run",
     "android:sync": "npm run build && cap sync android",
     "android:apk": "npm run android:sync && cd android && ./gradlew assembleDebug",
