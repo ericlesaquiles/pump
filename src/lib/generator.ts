@@ -1,7 +1,7 @@
 // Rule-based plan generator. Pure functions: same answers + same exercise
 // list => same plan. See the design doc, "Plan generation algorithm".
 import {
-  PATTERNS, MUSCLES, MUSCLE_KEYS, SPLITS, DAY_TEMPLATES, DEFAULT_WEEKDAYS, PRESCRIPTION,
+  PATTERNS, MUSCLES, MUSCLE_KEYS, SPLITS, DAY_TEMPLATES, PRESCRIPTION,
   BASE_WEEKLY_SETS, SKILL_RANK, PRIORITY_GROUPS, JOINTS, MOVEMENTS,
 } from "./constants.ts";
 import type {
@@ -30,7 +30,6 @@ type Volume = Record<Muscle, number>;
 
 export const DEFAULT_ANSWERS: Answers = {
   days: 4,
-  weekdays: DEFAULT_WEEKDAYS[4]!,
   minutes: 60,
   goal: "muscle",
   experience: "intermediate",
@@ -48,10 +47,8 @@ export function normalizeAnswers(a: RawAnswers = {}): Answers {
   for (const [j, s] of Object.entries(a.injuries ?? {})) {
     if (j in JOINTS && (s === "mild" || s === "avoid" || s === "injured")) injuries[j as Joint] = s as Severity;
   }
-  const weekdays = Array.isArray(a.weekdays) && a.weekdays.length === days ? [...a.weekdays].sort((x, y) => x - y) : DEFAULT_WEEKDAYS[days]!;
   return {
     days,
-    weekdays,
     minutes: Math.min(120, Math.max(30, Number(a.minutes) || 60)),
     goal: a.goal && a.goal in PRESCRIPTION ? a.goal : "muscle",
     experience: a.experience && a.experience in BASE_WEEKLY_SETS ? a.experience : "intermediate",
@@ -274,9 +271,9 @@ export function generatePlan(rawAnswers: RawAnswers, exercises: Exercise[], { no
   }
 
   // Steps 1 + 4 + 5: split, slots, fill each slot.
-  const days: PlanDay[] = split.days.map((key, i) => {
+  const days: PlanDay[] = split.days.map((key) => {
     const tpl = DAY_TEMPLATES[key];
-    const day: PlanDay = { key, name: tpl.name, focus: tpl.focus, weekday: answers.weekdays[i] ?? 1, estMinutes: 0, exercises: [] };
+    const day: PlanDay = { key, name: tpl.name, focus: tpl.focus, estMinutes: 0, exercises: [] };
     const inDay = new Set<string>();
     tpl.slots.forEach((slot, slotIdx) => {
       const best = candidatesFor(slot.p, exercises, answers, { used, exclude: inDay })[0];

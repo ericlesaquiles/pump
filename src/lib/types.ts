@@ -41,7 +41,6 @@ export interface Exercise {
 
 export interface Answers {
   days: number;
-  weekdays: number[];
   minutes: number;
   goal: Goal;
   experience: Experience;
@@ -54,7 +53,7 @@ export interface Answers {
 }
 
 /** Input to normalizeAnswers: anything may be missing or loosely typed. */
-export type RawAnswers = Partial<Omit<Answers, "weekdays" | "age">> & { weekdays?: number[] | null; age?: number | string | null };
+export type RawAnswers = Partial<Omit<Answers, "age">> & { age?: number | string | null };
 
 export interface PlanExercise {
   slot: number;
@@ -74,7 +73,6 @@ export interface PlanDay {
   key: DayKey;
   name: string;
   focus: string;
-  weekday: number;
   estMinutes: number;
   exercises: PlanExercise[];
 }

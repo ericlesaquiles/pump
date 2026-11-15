@@ -117,17 +117,6 @@ export const EXPERIENCE: Record<Experience, string> = {
 
 export const SKILL_RANK: Record<Experience, number> = { beginner: 0, intermediate: 1, advanced: 2 };
 
-export const WEEKDAYS = ["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"] as const;
-
-// Default training weekdays per number of days (0 = Sunday).
-export const DEFAULT_WEEKDAYS: Record<number, number[]> = {
-  2: [1, 4],
-  3: [1, 3, 5],
-  4: [1, 2, 4, 5],
-  5: [1, 2, 4, 5, 6],
-  6: [1, 2, 3, 4, 5, 6],
-};
-
 export interface SlotTemplate { p: Pattern; opt: boolean }
 export interface DayTemplate { name: string; focus: string; slots: SlotTemplate[] }
 
@@ -136,9 +125,9 @@ export interface DayTemplate { name: string; focus: string; slots: SlotTemplate[
 const S = (p: Pattern, opt = false): SlotTemplate => ({ p, opt });
 
 export const DAY_TEMPLATES: Record<DayKey, DayTemplate> = {
-  full_a: { name: "Full body A", focus: "Squat, press, pulldown", slots: [S("squat"), S("horizontal_push"), S("vertical_pull"), S("knee_flex"), S("lateral_raise", true), S("triceps_ext", true), S("calf_raise", true)] },
-  full_b: { name: "Full body B", focus: "Hinge, incline, row", slots: [S("hinge"), S("incline_push"), S("horizontal_pull"), S("lunge", true), S("biceps_curl", true), S("rear_delt", true), S("core", true)] },
-  full_c: { name: "Full body C", focus: "Legs, press, row", slots: [S("squat"), S("vertical_push"), S("horizontal_pull"), S("hip_thrust", true), S("knee_ext", true), S("chest_fly", true), S("biceps_curl", true), S("core", true)] },
+  full_a: { name: "Full body", focus: "Squat, press, pulldown", slots: [S("squat"), S("horizontal_push"), S("vertical_pull"), S("knee_flex"), S("lateral_raise", true), S("triceps_ext", true), S("calf_raise", true)] },
+  full_b: { name: "Full body", focus: "Hinge, incline, row", slots: [S("hinge"), S("incline_push"), S("horizontal_pull"), S("lunge", true), S("biceps_curl", true), S("rear_delt", true), S("core", true)] },
+  full_c: { name: "Full body", focus: "Legs, press, row", slots: [S("squat"), S("vertical_push"), S("horizontal_pull"), S("hip_thrust", true), S("knee_ext", true), S("chest_fly", true), S("biceps_curl", true), S("core", true)] },
   upper: { name: "Upper", focus: "Chest, back, shoulders, arms", slots: [S("horizontal_push"), S("horizontal_pull"), S("vertical_push"), S("vertical_pull"), S("lateral_raise", true), S("biceps_curl", true), S("triceps_ext", true), S("rear_delt", true)] },
   lower: { name: "Lower", focus: "Quads, hamstrings, glutes, calves", slots: [S("squat"), S("hinge"), S("lunge", true), S("knee_flex"), S("knee_ext", true), S("calf_raise"), S("core", true)] },
   push: { name: "Push", focus: "Chest, shoulders, triceps", slots: [S("incline_push"), S("horizontal_push"), S("lateral_raise"), S("vertical_push", true), S("chest_fly", true), S("triceps_ext")] },

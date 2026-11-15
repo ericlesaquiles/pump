@@ -1,6 +1,7 @@
-import { WEEKDAYS } from "../../lib/constants.ts";
+import { dayLetter } from "../../lib/rotation.ts";
 import type { PlanDay } from "../../lib/types.ts";
 import { Button } from "../common/Button.tsx";
+import { Chip } from "../common/Chip.tsx";
 import { Plate } from "../common/Plate.tsx";
 import { ExerciseRow } from "./ExerciseRow.tsx";
 import styles from "./DayCard.module.css";
@@ -8,12 +9,14 @@ import styles from "./DayCard.module.css";
 interface Props {
   day: PlanDay;
   dayIdx: number;
+  /** This is the next workout in the rotation. */
+  isNext: boolean;
   onStart: () => void;
   onInfo: (exId: string) => void;
   onSwap: (exIdx: number) => void;
 }
 
-export function DayCard({ day, dayIdx, onStart, onInfo, onSwap }: Props) {
+export function DayCard({ day, dayIdx, isNext, onStart, onInfo, onSwap }: Props) {
   const headingId = `day-${dayIdx}`;
   const active = day.exercises.map((item, exIdx) => ({ item, exIdx })).filter(({ item }) => item.sets > 0);
   return (
@@ -22,8 +25,8 @@ export function DayCard({ day, dayIdx, onStart, onInfo, onSwap }: Props) {
         <div className={styles.title}>
           <Plate day={day.key} />
           <div>
-            <h2 id={headingId}>{WEEKDAYS[day.weekday]} · {day.name}</h2>
-            <div className={styles.meta}>{day.focus} · about {day.estMinutes} min</div>
+            <h2 id={headingId}>Workout {dayLetter(dayIdx)} · {day.name}</h2>
+            <div className={styles.meta}>{day.focus} · about {day.estMinutes} min{isNext && <> · <Chip tone="good">next</Chip></>}</div>
           </div>
         </div>
         <Button small onClick={onStart}>Start workout</Button>

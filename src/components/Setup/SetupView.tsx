@@ -1,7 +1,7 @@
 import { useState, type FormEvent } from "react";
 import { useAppState } from "../../hooks/useAppState.tsx";
 import { useToast } from "../../hooks/useToast.tsx";
-import { EQUIPMENT, EXPERIENCE, FULL_GYM, GOALS, MOVEMENTS, PRIORITY_GROUPS, SPLITS, WEEKDAYS } from "../../lib/constants.ts";
+import { EQUIPMENT, EXPERIENCE, FULL_GYM, GOALS, MOVEMENTS, PRIORITY_GROUPS, SPLITS } from "../../lib/constants.ts";
 import { DEFAULT_ANSWERS, normalizeAnswers } from "../../lib/generator.ts";
 import type { Answers, Equipment, Experience, Goal, Movement, PriorityGroup } from "../../lib/types.ts";
 import { Button, LinkButton } from "../common/Button.tsx";
@@ -26,13 +26,11 @@ export function SetupView() {
   const toast = useToast();
   const editing = Boolean(plan);
   const [a, setA] = useState<Answers>(() => normalizeAnswers(saved ?? DEFAULT_ANSWERS));
-  // Weekdays are only used when exactly `days` are picked; otherwise the defaults apply.
-  const [weekdays, setWeekdays] = useState<number[]>(a.weekdays);
   const set = <K extends keyof Answers>(k: K, v: Answers[K]) => setA((prev) => ({ ...prev, [k]: v }));
 
   const submit = (e: FormEvent) => {
     e.preventDefault();
-    buildPlan(normalizeAnswers({ ...a, weekdays: weekdays.length === a.days ? weekdays : null }));
+    buildPlan(normalizeAnswers(a));
     window.location.hash = "#plan";
     toast("Plan ready");
   };
@@ -47,16 +45,10 @@ export function SetupView() {
       {editing && <Callout small>Saving builds a new plan. Your logged workouts are kept.</Callout>}
 
       <form className={styles.form} onSubmit={submit} noValidate>
-        <Question title="1. Days per week">
-          <OptionGroup label="Days per week" options={[2, 3, 4, 5, 6].map((d) => ({ value: d, label: `${d} days` }))} value={a.days} onChange={(v) => set("days", v)} />
+        <Question title="1. Workouts per week">
+          <OptionGroup label="Workouts per week" options={[2, 3, 4, 5, 6].map((d) => ({ value: d, label: `${d}×` }))} value={a.days} onChange={(v) => set("days", v)} />
           <Hint>Split: {SPLITS[a.days]?.name}. Each muscle is trained about twice a week.</Hint>
-          <details>
-            <summary className={styles.summary}>Choose the weekdays (optional)</summary>
-            <div className={styles.inner}>
-              <OptionGroup multiple label="Weekdays" options={[1, 2, 3, 4, 5, 6, 0].map((w) => ({ value: w, label: WEEKDAYS[w] ?? "" }))} value={weekdays} onChange={setWeekdays} />
-              <Hint>Pick exactly {a.days} days, or the default days are used.</Hint>
-            </div>
-          </details>
+          <Hint>Workouts aren't tied to weekdays: you do them in order (A, B, C…) on whichever days suit you, and the app suggests the next one.</Hint>
         </Question>
 
         <Question title="2. Session length">

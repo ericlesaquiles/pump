@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { fmtDate } from "../../lib/format.ts";
+import { dayLetter } from "../../lib/rotation.ts";
 import type { Session } from "../../lib/types.ts";
 import { Button } from "../common/Button.tsx";
 import { Plate } from "../common/Plate.tsx";
@@ -32,7 +33,7 @@ export function SessionList({ sessions, onOpen, onDelete }: Props) {
         <li key={s.id} className={styles.item}>
           <Plate day={s.dayKey} />
           <button type="button" className={styles.open} onClick={() => onOpen(s)}>
-            <strong>{s.dayName}</strong> · {fmtDate(s.date)}
+            <strong>{dayLetter(s.dayIdx)} · {s.dayName}</strong> · {fmtDate(s.date)}
             <span className={styles.meta}>{setCount(s)} sets · {Math.round(volume(s)).toLocaleString()} {s.unit} lifted</span>
           </button>
           {armed === s.id ? (

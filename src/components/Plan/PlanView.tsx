@@ -4,6 +4,7 @@ import { useAppState } from "../../hooks/useAppState.tsx";
 import { useToast } from "../../hooks/useToast.tsx";
 import { GOALS } from "../../lib/constants.ts";
 import { isoDate } from "../../lib/format.ts";
+import { nextDayIdx } from "../../lib/rotation.ts";
 import { applySwap } from "../../lib/swap.ts";
 import type { Plan } from "../../lib/types.ts";
 import { Button, LinkButton } from "../common/Button.tsx";
@@ -16,21 +17,23 @@ import { DayCard } from "./DayCard.tsx";
 import { ProgressionTips } from "./ProgressionTips.tsx";
 import { ReviewPanel } from "./ReviewPanel.tsx";
 import { VolumeChart } from "./VolumeChart.tsx";
-import { WeekStrip } from "./WeekStrip.tsx";
+import { ThisWeek } from "./ThisWeek.tsx";
 import styles from "./PlanView.module.css";
 
 export function PlanView({ plan }: { plan: Plan }) {
-  const { rebuildPlan, updatePlan, setLogSel } = useAppState();
+  const { sessions, rebuildPlan, updatePlan, setLogSel } = useAppState();
   const toast = useToast();
   const [infoId, setInfoId] = useState<string | null>(null);
   const [swap, setSwap] = useState<{ dayIdx: number; exIdx: number } | null>(null);
   const a = plan.answers;
+  const next = nextDayIdx(plan, sessions);
+  const start = (dayIdx: number) => { setLogSel({ dayIdx, date: isoDate(new Date()) }); window.location.hash = "#log"; };
 
   return (
     <>
       <PageHeader
-        eyebrow={`${plan.splitName} · ${a.days} days · ${a.minutes} min · ${GOALS[a.goal]}`}
-        title="Your week"
+        eyebrow={`${plan.splitName} · ${a.days}× a week · ${a.minutes} min · ${GOALS[a.goal]}`}
+        title="Your plan"
         actions={
           <>
             <LinkButton href="#setup">Edit answers</LinkButton>
@@ -40,7 +43,7 @@ export function PlanView({ plan }: { plan: Plan }) {
       />
       {plan.notices.length > 0 && <Callout tone="danger" items={plan.notices} />}
       {plan.warnings.length > 0 && <Callout tone="warn" title="Things to know about this plan" items={plan.warnings.map((w) => w.text)} />}
-      <WeekStrip days={plan.days} />
+      <ThisWeek plan={plan} sessions={sessions} onStart={start} />
 
       <div className={styles.grid}>
         <div className={styles.stack}>
@@ -49,7 +52,8 @@ export function PlanView({ plan }: { plan: Plan }) {
               key={`${dayIdx}-${day.key}`}
               day={day}
               dayIdx={dayIdx}
-              onStart={() => { setLogSel({ dayIdx, date: isoDate(new Date()) }); window.location.hash = "#log"; }}
+              isNext={dayIdx === next}
+              onStart={() => start(dayIdx)}
               onInfo={setInfoId}
               onSwap={(exIdx) => setSwap({ dayIdx, exIdx })}
             />

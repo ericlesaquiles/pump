@@ -3,6 +3,7 @@ import { EXERCISES } from "../data/exercises.ts";
 import { generatePlan } from "../lib/generator.ts";
 import { store } from "../lib/storage.ts";
 import { isoDate } from "../lib/format.ts";
+import { nextDayIdx } from "../lib/rotation.ts";
 import type { Answers, Plan, Session, Settings } from "../lib/types.ts";
 
 /** Which workout the Workout screen shows. */
@@ -102,12 +103,13 @@ export function useAppState(): AppState {
   return ctx;
 }
 
-/** The plan day that matches today's weekday, or the next one coming up. */
-export function defaultLogSelection(plan: Plan): LogSelection {
-  const today = new Date();
-  for (let k = 0; k < 7; k++) {
-    const idx = plan.days.findIndex((d) => d.weekday === (today.getDay() + k) % 7);
-    if (idx >= 0) return { dayIdx: idx, date: isoDate(today) };
-  }
-  return { dayIdx: 0, date: isoDate(today) };
+/**
+ * Which workout to show on the Workout screen: one already logged today under
+ * this plan (so it can be edited), otherwise the next one in the rotation.
+ */
+export function defaultLogSelection(plan: Plan, sessions: Session[]): LogSelection {
+  const today = isoDate(new Date());
+  const done = sessions.filter((s) => s.planId === plan.id && s.date === today && s.dayIdx < plan.days.length);
+  const latest = done.sort((a, b) => (a.savedAt < b.savedAt ? 1 : -1))[0];
+  return { dayIdx: latest ? latest.dayIdx : nextDayIdx(plan, sessions), date: today };
 }

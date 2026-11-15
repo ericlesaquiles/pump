@@ -2,10 +2,10 @@ import { useEffect, useMemo, useState } from "react";
 import { EXERCISES, EXERCISE_BY_ID } from "../../data/exercises.ts";
 import { defaultLogSelection, useAppState } from "../../hooks/useAppState.tsx";
 import { useToast } from "../../hooks/useToast.tsx";
-import { WEEKDAYS } from "../../lib/constants.ts";
 import { isoDate } from "../../lib/format.ts";
 import { setKeepAwake } from "../../lib/native.ts";
 import { historyFor } from "../../lib/progression.ts";
+import { dayLetter, nextDayIdx } from "../../lib/rotation.ts";
 import { store } from "../../lib/storage.ts";
 import { applySwap } from "../../lib/swap.ts";
 import type { Plan, WorkoutDraft } from "../../lib/types.ts";
@@ -28,8 +28,9 @@ function loadWorkout(plan: Plan, dayIdx: number, date: string, sessions: Paramet
 export function WorkoutView({ plan }: { plan: Plan }) {
   const { sessions, settings, logSel, setLogSel, saveSession, updatePlan } = useAppState();
   const toast = useToast();
-  const sel = logSel && logSel.dayIdx < plan.days.length ? logSel : defaultLogSelection(plan);
+  const sel = logSel && logSel.dayIdx < plan.days.length ? logSel : defaultLogSelection(plan, sessions);
   const day = plan.days[sel.dayIdx];
+  const next = nextDayIdx(plan, sessions);
 
   const [state, setState] = useState(() => loadWorkout(plan, sel.dayIdx, sel.date, sessions, settings.unit));
   const [dirty, setDirty] = useState(false);
@@ -93,13 +94,13 @@ export function WorkoutView({ plan }: { plan: Plan }) {
     <>
       <PageHeader
         eyebrow="Workout"
-        title={day.name}
+        title={`Workout ${dayLetter(sel.dayIdx)} · ${day.name}`}
         actions={
           <>
             <label className={styles.field}>
-              <span className={styles.label}>Day</span>
+              <span className={styles.label}>Workout</span>
               <select value={sel.dayIdx} onChange={(e) => { setLogSel({ ...sel, dayIdx: Number(e.target.value) }); setHurt(null); }}>
-                {plan.days.map((d, i) => <option key={i} value={i}>{WEEKDAYS[d.weekday]} · {d.name}</option>)}
+                {plan.days.map((d, i) => <option key={i} value={i}>{dayLetter(i)} · {d.name}{i === next ? " (next)" : ""}</option>)}
               </select>
             </label>
             <label className={styles.field}>
@@ -112,7 +113,7 @@ export function WorkoutView({ plan }: { plan: Plan }) {
 
       {hurt && <HurtCallout info={hurt} onDismiss={() => setHurt(null)} onSwap={(dayIdx, slot) => setSwap({ entryIdx: -1, mode: "plan", dayIdx, slot })} />}
 
-      {workout.entries.length === 0 && <Callout>This day has no exercises. Pick another day.</Callout>}
+      {workout.entries.length === 0 && <Callout>This workout has no exercises. Pick another one.</Callout>}
       {workout.entries.map((entry, i) => {
         const slot = day.exercises[entry.slot];
         if (!slot) return null;

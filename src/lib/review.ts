@@ -1,13 +1,15 @@
 // Optional AI review of a plan. Text only, opt-in, never applied automatically.
 // The Anthropic SDK is loaded lazily (its own chunk) only when a review is requested.
-import { MUSCLES, MUSCLE_KEYS, JOINTS, MOVEMENTS, GOALS, EXPERIENCE, PRIORITY_GROUPS, WEEKDAYS } from "./constants.ts";
+import { MUSCLES, MUSCLE_KEYS, JOINTS, MOVEMENTS, GOALS, EXPERIENCE, PRIORITY_GROUPS } from "./constants.ts";
 import { indexExercises } from "./generator.ts";
+import { dayLetter } from "./rotation.ts";
 import type { Exercise, Joint, Plan, ReviewFinding } from "./types.ts";
 
 export const MODEL = "claude-opus-5-5";
 
 export const SYSTEM_PROMPT = `You review weekly strength-training plans produced by a rule-based app.
 Judge the plan against current evidence on resistance training for the person's goal and experience.
+The workouts are done in rotation (A, B, C…) on whichever days suit the person, not on fixed weekdays.
 Check, in this order:
 1. Weekly hard sets per muscle against the targets given (roughly 10+ for growth, fewer for beginners and small muscles).
 2. Balance: pushing vs pulling sets, quads vs hamstrings, enough rear-delt and upper-back work.
@@ -79,8 +81,8 @@ export function buildReviewInput(plan: Plan, exercises: Exercise[]): ReviewInput
       ...(a.age ? { age: a.age } : {}),
     },
     split: plan.splitName,
-    days: plan.days.map((d) => ({
-      day: `${WEEKDAYS[d.weekday]} – ${d.name}`,
+    days: plan.days.map((d, i) => ({
+      day: `Workout ${dayLetter(i)} – ${d.name}`,
       estimatedMinutes: d.estMinutes,
       exercises: d.exercises.filter((s) => s.sets > 0).map((s) => ({
         name: byId.get(s.exId)?.name ?? s.exId,

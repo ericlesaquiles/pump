@@ -8,6 +8,7 @@ import { BackupPanel } from "./BackupPanel.tsx";
 import { PastSessionDialog } from "./PastSessionDialog.tsx";
 import { ProgressPanel } from "./ProgressPanel.tsx";
 import { SessionList } from "./SessionList.tsx";
+import { TrainingCalendar } from "./TrainingCalendar.tsx";
 import styles from "./HistoryView.module.css";
 
 export function HistoryView({ plan }: { plan: Plan }) {
@@ -31,6 +32,7 @@ export function HistoryView({ plan }: { plan: Plan }) {
           <SessionList sessions={sorted} onOpen={open} onDelete={(s) => { deleteSession(s.id); toast("Workout deleted"); }} />
         </Panel>
         <aside className={styles.stack}>
+          <TrainingCalendar sessions={sessions} onOpen={open} />
           <ProgressPanel sessions={sessions} />
           <BackupPanel />
         </aside>
