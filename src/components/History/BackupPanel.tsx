@@ -2,6 +2,8 @@ import { useState, type ChangeEvent } from "react";
 import { useAppState } from "../../hooks/useAppState.tsx";
 import { useToast } from "../../hooks/useToast.tsx";
 import { isoDate } from "../../lib/format.ts";
+import { shareBackup } from "../../lib/native.ts";
+import { isNative } from "../../lib/platform.ts";
 import { store } from "../../lib/storage.ts";
 import { Button } from "../common/Button.tsx";
 import { Panel } from "../common/Panel.tsx";
@@ -12,11 +14,25 @@ export function BackupPanel() {
   const toast = useToast();
   const [error, setError] = useState<string | null>(null);
 
-  const exportBackup = () => {
-    const blob = new Blob([JSON.stringify(store.exportAll(), null, 2)], { type: "application/json" });
+  const exportBackup = async () => {
+    const json = JSON.stringify(store.exportAll(), null, 2);
+    const filename = `pump-backup-${isoDate(new Date())}.json`;
+    if (isNative) {
+      // Android: save to the app's cache and open the share sheet (Drive, email, Files…).
+      try {
+        await shareBackup(filename, json);
+        setError(null);
+      } catch (err) {
+        // Closing the share sheet without choosing anything also lands here; only report real failures.
+        const msg = err instanceof Error ? err.message : "";
+        if (!/cancel/i.test(msg)) setError("Couldn't export the backup. Try again.");
+      }
+      return;
+    }
+    const blob = new Blob([json], { type: "application/json" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(blob);
-    a.download = `pump-backup-${isoDate(new Date())}.json`;
+    a.download = filename;
     document.body.append(a);
     a.click();
     window.setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
@@ -39,7 +55,7 @@ export function BackupPanel() {
     <Panel label="Backup">
       <p className={styles.text}>Your data lives only in this browser. Export a backup file now and then. API keys are not included.</p>
       <div className={styles.row}>
-        <Button variant="ghost" small onClick={exportBackup}>Export backup</Button>
+        <Button variant="ghost" small onClick={() => void exportBackup()}>Export backup</Button>
         <label className={styles.import}>
           Import backup
           <input type="file" accept="application/json,.json" onChange={onFile} hidden />

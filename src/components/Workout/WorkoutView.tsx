@@ -4,6 +4,7 @@ import { defaultLogSelection, useAppState } from "../../hooks/useAppState.tsx";
 import { useToast } from "../../hooks/useToast.tsx";
 import { WEEKDAYS } from "../../lib/constants.ts";
 import { isoDate } from "../../lib/format.ts";
+import { setKeepAwake } from "../../lib/native.ts";
 import { historyFor } from "../../lib/progression.ts";
 import { store } from "../../lib/storage.ts";
 import { applySwap } from "../../lib/swap.ts";
@@ -47,6 +48,12 @@ export function WorkoutView({ plan }: { plan: Plan }) {
     setDirty(false);
     setError(null);
   }
+
+  // Keep the screen on while logging a workout (Android app only).
+  useEffect(() => {
+    void setKeepAwake(true);
+    return () => { void setKeepAwake(false); };
+  }, []);
 
   // Keep unsaved changes as a draft on this device.
   useEffect(() => {

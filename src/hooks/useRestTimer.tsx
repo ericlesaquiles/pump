@@ -1,5 +1,6 @@
 import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
 import { RestTimer } from "../components/Workout/RestTimer.tsx";
+import { buzz, cancelRestEnd, scheduleRestEnd } from "../lib/native.ts";
 
 interface TimerApi { start: (seconds: number) => void }
 const Ctx = createContext<TimerApi>({ start: () => {} });
@@ -19,21 +20,26 @@ export function RestTimerProvider({ children }: { children: ReactNode }) {
   const done = end !== null && left === 0;
 
   useEffect(() => {
-    if (done) {
-      try { navigator.vibrate?.(300); } catch { /* not supported */ }
-    }
+    if (done) void buzz();
   }, [done]);
 
   const start = useCallback((seconds: number) => {
     setNow(Date.now());
     setEnd(Date.now() + seconds * 1000);
+    // On Android, also notify when rest ends in case the phone is locked.
+    void scheduleRestEnd(seconds);
+  }, []);
+
+  const stop = useCallback(() => {
+    setEnd(null);
+    void cancelRestEnd();
   }, []);
 
   return (
     <Ctx.Provider value={{ start }}>
       {children}
       {end !== null && (
-        <RestTimer seconds={left} done={done} onAdd={() => start(left + 30)} onStop={() => setEnd(null)} />
+        <RestTimer seconds={left} done={done} onAdd={() => start(left + 30)} onStop={stop} />
       )}
     </Ctx.Provider>
   );
