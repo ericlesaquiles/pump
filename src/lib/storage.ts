@@ -1,6 +1,15 @@
 // Local persistence. Everything stays on this device.
+//
+// In a browser the data lives in localStorage. In the Android app it lives in
+// Capacitor Preferences (Android SharedPreferences), because Android may clear a
+// web view's localStorage. Preferences is async, so on Android every pump:* key
+// is loaded into memory once at startup (initStorage) and writes go to memory
+// first, then to Preferences in the background. The `store` API stays synchronous.
+import { Preferences } from "@capacitor/preferences";
+import { isNative } from "./platform.ts";
 import type { Answers, Plan, Session, Settings, WorkoutDraft } from "./types.ts";
 
+const PREFIX = "pump:";
 const KEYS = {
   answers: "pump:answers",
   plan: "pump:plan",
@@ -9,9 +18,51 @@ const KEYS = {
   draft: "pump:draft",
 } as const;
 
+interface Backend {
+  get(key: string): string | null;
+  set(key: string, value: string): void;
+  remove(key: string): void;
+  keys(): string[];
+}
+
+const webBackend: Backend = {
+  get: (k) => localStorage.getItem(k),
+  set: (k, v) => localStorage.setItem(k, v),
+  remove: (k) => localStorage.removeItem(k),
+  keys: () => Object.keys(localStorage),
+};
+
+const memory = new Map<string, string>();
+const nativeBackend: Backend = {
+  get: (k) => memory.get(k) ?? null,
+  set: (k, v) => {
+    memory.set(k, v);
+    Preferences.set({ key: k, value: v }).catch((e: unknown) => console.error("Pump: couldn't save", k, e));
+  },
+  remove: (k) => {
+    memory.delete(k);
+    Preferences.remove({ key: k }).catch((e: unknown) => console.error("Pump: couldn't remove", k, e));
+  },
+  keys: () => [...memory.keys()],
+};
+
+const backend: Backend = isNative ? nativeBackend : webBackend;
+
+/** Load saved data before the app renders. Needed on Android; instant in a browser. */
+export async function initStorage(): Promise<void> {
+  if (!isNative) return;
+  const { keys } = await Preferences.keys();
+  const pumpKeys = keys.filter((k) => k.startsWith(PREFIX));
+  const values = await Promise.all(pumpKeys.map((key) => Preferences.get({ key })));
+  pumpKeys.forEach((k, i) => {
+    const v = values[i]?.value;
+    if (v != null) memory.set(k, v);
+  });
+}
+
 function read<T>(key: string, fallback: T): T {
   try {
-    const raw = localStorage.getItem(key);
+    const raw = backend.get(key);
     return raw == null ? fallback : (JSON.parse(raw) as T);
   } catch {
     return fallback;
@@ -20,8 +71,8 @@ function read<T>(key: string, fallback: T): T {
 
 function write(key: string, value: unknown): boolean {
   try {
-    if (value == null) localStorage.removeItem(key);
-    else localStorage.setItem(key, JSON.stringify(value));
+    if (value == null) backend.remove(key);
+    else backend.set(key, JSON.stringify(value));
     return true;
   } catch {
     return false;
@@ -67,7 +118,7 @@ export const store = {
   },
   clearAll(): void {
     try {
-      for (const k of Object.keys(localStorage)) if (k.startsWith("pump:")) localStorage.removeItem(k);
+      for (const k of backend.keys()) if (k.startsWith(PREFIX)) backend.remove(k);
     } catch { /* storage unavailable */ }
   },
 };

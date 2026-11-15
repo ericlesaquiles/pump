@@ -8,7 +8,8 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      injectRegister: "auto",
+      // Registered from main.tsx, and only in the browser (not in the Android app).
+      injectRegister: null,
       includeAssets: ["icon.svg"],
       manifest: {
         name: "Pump",
