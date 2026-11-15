@@ -19,5 +19,5 @@
     "skipLibCheck": true,
     "types": ["vite/client", "vite-plugin-pwa/client", "node"]
   },
-  "include": ["src", "test", "scripts", "data", "vite.config.ts"]
+  "include": ["src", "test", "scripts", "data", "vite.config.ts", "capacitor.config.ts"]
 }
