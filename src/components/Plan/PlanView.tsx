@@ -7,6 +7,7 @@ import { isoDate } from "../../lib/format.ts";
 import { nextDayIdx } from "../../lib/rotation.ts";
 import { applySwap } from "../../lib/swap.ts";
 import type { Plan } from "../../lib/types.ts";
+import { AskClaudeButton } from "../common/AskClaudeButton.tsx";
 import { Button, LinkButton } from "../common/Button.tsx";
 import { Callout } from "../common/Callout.tsx";
 import { PageHeader } from "../common/PageHeader.tsx";
@@ -64,6 +65,10 @@ export function PlanView({ plan }: { plan: Plan }) {
           <Panel label={t.plan.weeklySets}>
             <VolumeChart plan={plan} />
             <p className={styles.note}>{t.plan.weeklyNote}</p>
+          </Panel>
+          <Panel label={t.ask.panel}>
+            <p className={styles.note}>{t.ask.hint}</p>
+            <div><AskClaudeButton focus={{ kind: "plan" }} variant="primary" /></div>
           </Panel>
           <ReviewPanel plan={plan} />
           <ProgressionTips />

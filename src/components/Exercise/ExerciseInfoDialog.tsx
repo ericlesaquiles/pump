@@ -4,6 +4,7 @@ import { useExerciseGif } from "../../hooks/useExerciseGif.ts";
 import { useI18n } from "../../hooks/useI18n.ts";
 import { historyFor, topSetSeries } from "../../lib/progression.ts";
 import type { Equipment, Joint, Muscle } from "../../lib/types.ts";
+import { AskClaudeButton } from "../common/AskClaudeButton.tsx";
 import { Callout } from "../common/Callout.tsx";
 import { Dialog } from "../common/Dialog.tsx";
 import { Sparkline } from "../common/Sparkline.tsx";
@@ -55,6 +56,7 @@ export function ExerciseInfoDialog({ exId, onClose }: { exId: string; onClose: (
           <Sparkline series={topSetSeries(hist)} unit={lastUnit} />
         </div>
       )}
+      <div><AskClaudeButton focus={{ kind: "exercise", exId }} label={t.ask.aboutExercise} /></div>
       <p className={styles.small}>
         <a href={video} target="_blank" rel="noopener noreferrer">{t.exercise.video}</a> <span className={styles.muted}>{t.exercise.needsNet}</span>
       </p>

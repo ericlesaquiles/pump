@@ -27,6 +27,36 @@ export async function shareBackup(filename: string, json: string, text: { title:
   await Share.share({ title: text.title, files: [uri], dialogTitle: text.dialogTitle });
 }
 
+export type ShareResult = "shared" | "copied" | "cancelled";
+
+/**
+ * Hand text to another app: the Android share sheet (pick Claude, WhatsApp…), the
+ * browser's share menu where there is one, otherwise the clipboard.
+ */
+export async function shareText(text: string, title: string): Promise<ShareResult> {
+  const cancelled = (e: unknown) => /cancel|abort/i.test(e instanceof Error ? `${e.name} ${e.message}` : String(e));
+  if (isNative) {
+    try {
+      await Share.share({ title, text, dialogTitle: title });
+      return "shared";
+    } catch (e) {
+      if (cancelled(e)) return "cancelled";
+      throw e;
+    }
+  }
+  if (typeof navigator.share === "function") {
+    try {
+      await navigator.share({ title, text });
+      return "shared";
+    } catch (e) {
+      if (cancelled(e)) return "cancelled";
+      // Fall through to the clipboard (e.g. share not allowed here).
+    }
+  }
+  await navigator.clipboard.writeText(text);
+  return "copied";
+}
+
 /** Keep the screen on while a workout is open. */
 export async function setKeepAwake(on: boolean): Promise<void> {
   if (!isNative) return;

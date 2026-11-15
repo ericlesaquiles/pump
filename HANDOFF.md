@@ -81,6 +81,10 @@ Time model, caps and weights live in `LIMITS` at the top of `generator.ts`.
 - Translation choices: inches/feet converted to cm; the original's "knees must not pass the toes" rule is attributed to the original text instead of stated as fact (current evidence doesn't support it as a universal rule); references to a "foot positioning section" that doesn't exist in the app were dropped.
 - The AI review sends labels and exercise names in the user's language and asks for a reply in it (`t.review.replyIn`).
 
+## Ask Claude (share to the Claude app)
+
+The user wanted to use their Claude subscription with Pump. A subscription can't be connected to a third-party app (apps use the API with a key), so Pump hands text to the Claude app instead: `src/lib/ask.ts` builds a short context (profile, plan, and the focused exercise's recent sets and next-step cue, or the current workout including unsaved sets and notes) in the user's language, and `shareText` in `src/lib/native.ts` opens the Android share sheet (browser: `navigator.share`, else clipboard). Buttons: exercise dialog, Workout screen, a panel on the Plan screen. Pump itself sends nothing. Option 2 discussed but not built: an in-app chat using the user's API key (paid separately), which could also apply suggested swaps.
+
 ## Data pipeline
 
 `data/overlay.ts` (126 hand-tagged exercises: pattern, muscle weights, equipment with `a|b` alternatives, skill, joint stress 1–3, painful-movement tags, staple flag) + `data/vendor/free-exercise-db.json` → `npm run build:data` (`scripts/build-data.ts`, run directly by Node's type stripping) → `src/data/exercises.json`. The script fails on unknown ids or tags.

@@ -11,6 +11,7 @@ import { store } from "../../lib/storage.ts";
 import { applySwap } from "../../lib/swap.ts";
 import type { Plan, WorkoutDraft } from "../../lib/types.ts";
 import { buildWorkout, sessionId, workoutToSession } from "../../lib/workout.ts";
+import { AskClaudeButton } from "../common/AskClaudeButton.tsx";
 import { Button } from "../common/Button.tsx";
 import { Callout } from "../common/Callout.tsx";
 import { PageHeader } from "../common/PageHeader.tsx";
@@ -138,6 +139,8 @@ export function WorkoutView({ plan }: { plan: Plan }) {
         <span className={styles.label}>{t.workout.notes}</span>
         <textarea rows={3} value={workout.note} placeholder={t.workout.notesHint} onChange={(e) => edit((w) => ({ ...w, note: e.target.value }))} />
       </label>
+
+      <div><AskClaudeButton focus={{ kind: "workout", workout }} label={t.ask.aboutWorkout} /></div>
 
       <div className={styles.savebar}>
         <Button onClick={save}>{workout.saved ? t.workout.update : t.workout.save}</Button>
