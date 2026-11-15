@@ -1,6 +1,6 @@
 # Pump — handoff
 
-Status as of 2026-11-08. Read this first; `README.md` covers commands and folder layout.
+Status as of 2026-11-15. Read this first; `README.md` covers commands and folder layout.
 
 ## What Pump is
 
@@ -18,8 +18,8 @@ Design doc (goals, algorithm, injury rules, data and media licensing, evidence a
 | React UI (5 screens, 37 components) | Written, type-checks and builds; **never clicked through in a browser** (Chrome extension wasn't connected) |
 | Offline (vite-plugin-pwa) | Builds a service worker that precaches everything; not verified offline in a browser |
 | AI review (`src/lib/review.ts`) | Written against SDK types; **never called against the real API** |
-| Android | Not started; plan below |
-| Git | Repo initialized with a `.gitignore` (ignores `node_modules/`, `dist/`, `.env*`, Android build output); **no commits yet** |
+| Android (Capacitor 8.5.3) | Project generated in `android/` and synced; native storage, back button, share-sheet backup, keep-awake, haptics and rest-end notification wired in. Debug APK builds (2026-11-15). **Never run** on a device or emulator (the emulator wouldn't start: not enough free disk for its 12 GB data partition) |
+| Git | `e87b35f` web app on `master`; Android work on branch `android-app` (not merged) |
 
 ### Verified
 
@@ -47,7 +47,7 @@ React 19.3.1 · TypeScript 7.0.2 (strict, `noUncheckedIndexedAccess`) · Vite 8.
 - AI review must stay **optional** and the app must work fully **offline** without it.
 - Base exercise data: free-exercise-db text (public domain). Do **not** use its photos in a shared app (ownership unclear).
 - Do **not** use the Gym visual GIFs from hasaneyldrm/exercises-dataset, and don't trace or AI-generate from them. Their terms make the free versions "entirely copyrighted" and licenses non-transferable. Plan instead: own animations (film → MediaPipe pose → SVG stick figures, ~30–60 per movement pattern) plus YouTube links (kinetic-place/exercises-db has 906/908 linked; quality varies, hand-check).
-- Preferred route to Android: **Capacitor** (reuse ~95% of the code). The user asked about difficulty but hasn't approved starting it.
+- Preferred route to Android: **Capacitor** (reuse ~95% of the code). Approved and built.
 
 ## How the algorithm works (short)
 
@@ -81,19 +81,36 @@ Time model, caps and weights live in `LIMITS` at the top of `generator.ts`.
 
 ## Next steps (suggested order)
 
-1. Make the first commit.
+1. Merge `android-app` once it has run on a phone.
 2. Browser pass over all screens (see "Not verified"), fix what breaks.
 3. Real API test of the AI review.
-4. If the user approves Android via Capacitor:
-   - `@capacitor/core`, `@capacitor/cli`, `@capacitor/android`; `npx cap init`, `npx cap add android` (needs Android Studio + SDK on the machine).
-   - Move persistence off localStorage (Android can clear web view storage): replace `src/lib/storage.ts` internals with Capacitor Preferences or SQLite; keep its interface.
-   - Backup export via Filesystem + Share plugins (the `<a download>` approach in `BackupPanel.tsx` won't work in a web view).
-   - Rest timer: keep-awake while working out, haptics, optional local notification when rest ends.
-   - Android back button closes the open dialog first.
-   - Icons and splash from `public/icon.svg`.
-   - Play Store: $25 developer account, privacy policy, Data safety form (injury answers are health data; the AI review sends data to Anthropic), ~2-week closed test for new personal accounts.
+4. Android (see "Android app" below): install the APK on a phone (or free disk / shrink the AVD's storage and use the emulator), and check everything in "Android: not verified".
 5. Professional review of joint-stress tags.
 6. Own animations and curated video ids.
+
+## Android app
+
+Capacitor wraps the same React build. App id `app.pump.planner` (in `capacitor.config.ts`; **can't change after publishing on Google Play** — pick the final id before the first upload). minSdk 24, targetSdk 36. Requires a full **JDK 21** (`openjdk-21-jdk-headless`, installed; the plugins ask for a Java 21 toolchain, so Android Studio's bundled JDK 25 doesn't work) and the Android SDK at `~/Android/Sdk` (`android/local.properties`, git-ignored). Gradle downloads platform 36 and build-tools 35 itself. All Capacitor packages are on v8 (`@capacitor/preferences` was moved from 7.0.4 to 8.0.1).
+
+Commands: `npm run android:sync` (build web app + copy into `android/`), `npm run android:open` (open in Android Studio), `npm run android:apk` (debug APK via Gradle, at `android/app/build/outputs/apk/debug/`).
+
+Native code lives in `src/lib/native.ts` (everything there is a no-op in the browser) and `src/lib/platform.ts` (`isNative`):
+
+- **Storage**: on Android, `src/lib/storage.ts` uses Capacitor Preferences instead of localStorage. All `pump:*` keys are loaded into memory by `initStorage()` before the first render (`main.tsx`); writes go to memory, then to Preferences asynchronously. The `store` API is unchanged and synchronous.
+- **Service worker**: only registered in the browser (`main.tsx`, `injectRegister: null` in `vite.config.ts`).
+- **Back button**: closes an open dialog (dispatches `cancel`), else goes back, else exits from the Plan screen.
+- **Backup export**: writes to the app cache and opens the share sheet (Filesystem + Share). Import still uses the file input.
+- **Workout screen**: keeps the screen awake.
+- **Rest timer**: haptics at the end, plus a local notification when rest ends (asks for notification permission the first time; scheduled with `allowWhileIdle`, so it may be a few seconds late without the exact-alarm permission).
+- **Icons**: adaptive launcher icon from vector drawables (`res/drawable/ic_pump_foreground.xml`, background `#1F2A36`), notification icon `ic_stat_pump`. Android 7.x (API 24–25) still shows Capacitor's default PNG icon and the default splash image.
+
+### Android: not verified
+
+Nothing has run on a device or emulator. Check: storage survives app restarts; back button with a dialog open; backup share sheet and import; keep-awake; rest-end notification with the phone locked; status-bar overlap with the sticky top bar (safe-area insets); external links (YouTube, console.anthropic.com) open in the browser; AI review request from the app.
+
+### Publishing later
+
+$25 Google Play developer account; privacy policy; Data safety form (injury answers are health data; the AI review sends data to Anthropic); release signing key; ~2-week closed test with testers for new personal developer accounts.
 
 ## Related artifacts
 
