@@ -71,12 +71,13 @@ test("swap reasons render in both languages", () => {
   }
 });
 
-test("every exercise has a Portuguese name", () => {
+test("every exercise has a Portuguese name and step-by-step instructions", () => {
   const data = ptData as Record<string, { name: string; instructions?: string[] }>;
   for (const ex of db) {
     assert.ok(data[ex.id]?.name, `${ex.id} has no Portuguese name`);
+    assert.equal(data[ex.id]?.instructions?.length, ex.instructions.length, `${ex.id}: same number of steps as the English`);
     const text = exerciseText(ex, "pt");
-    assert.equal(text.instructions.length > 0, ex.instructions.length > 0, `${ex.id} instructions`);
+    assert.notDeepEqual(text.instructions, ex.instructions, `${ex.id} falls back to English`);
   }
   assert.equal(Object.keys(data).length, db.length, "no translations for unknown exercises");
 });

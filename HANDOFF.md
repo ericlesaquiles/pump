@@ -1,6 +1,6 @@
 # Pump — handoff
 
-Status as of 2026-11-15. Read this first; `README.md` covers commands and folder layout.
+Status as of 2026-11-15 (rotation and Portuguese added). Read this first; `README.md` covers commands and folder layout.
 
 ## What Pump is
 
@@ -12,10 +12,12 @@ Design doc (goals, algorithm, injury rules, data and media licensing, evidence a
 
 | Area | State |
 |---|---|
-| Plan algorithm (`src/lib/generator.ts`) | Done, 17 Vitest tests passing |
+| Plan algorithm (`src/lib/generator.ts`) | Done; 27 Vitest tests passing (generator, rotation, i18n) |
 | Exercise swapping (`src/lib/swap.ts`) | Done, tested |
 | Progression cues (`src/lib/progression.ts`) | Done, tested |
-| React UI (5 screens, 37 components) | Written, type-checks and builds; **never clicked through in a browser** (Chrome extension wasn't connected) |
+| React UI (5 screens) | Renders at 400 px in Portuguese and English, light and dark (headless-Chrome screenshots, 2026-11-15, no console errors). Interactions not exercised beyond opening dialogs |
+| Workout rotation | Done (2026-11-15). Workouts are A, B, C… done in order on any day; no weekdays |
+| Portuguese (pt-BR) | Done (2026-11-15). UI, plan messages, exercise names and all 126 instruction sets |
 | Offline (vite-plugin-pwa) | Builds a service worker that precaches everything; not verified offline in a browser |
 | AI review (`src/lib/review.ts`) | Written against SDK types; **never called against the real API** |
 | Android (Capacitor 8.5.3) | Project generated in `android/` and synced; native storage, back button, share-sheet backup, keep-awake, haptics and rest-end notification wired in. Debug APK builds (2026-11-15). **Never run** on a device or emulator (the emulator wouldn't start: not enough free disk for its 12 GB data partition) |
@@ -32,7 +34,8 @@ Design doc (goals, algorithm, injury rules, data and media licensing, evidence a
 1. Click through every screen: questionnaire → plan → swap dialog → workout log (save, hurt flag, "swap for today", rest timer) → history (open, delete, progress chart, export/import) → settings (save, erase).
 2. Offline: load `npm run preview` once, go offline in DevTools, reload.
 3. AI review with a real key: confirm `fallbacks: "default"` + `output_config.format` are accepted together on `claude-opus-5-5`, and that the browser call works (`dangerouslyAllowBrowser: true`).
-4. Phone width (~400 px) and light mode.
+4. ~~Phone width and light mode~~ checked by screenshot on 2026-11-15; the Workout screen used to scroll sideways (fixed).
+5. The Portuguese exercise instructions were translated by the assistant: have a Portuguese-speaking coach skim them.
 
 ## Stack
 
@@ -47,6 +50,8 @@ React 19.3.1 · TypeScript 7.0.2 (strict, `noUncheckedIndexedAccess`) · Vite 8.
 - AI review must stay **optional** and the app must work fully **offline** without it.
 - Base exercise data: free-exercise-db text (public domain). Do **not** use its photos in a shared app (ownership unclear).
 - Do **not** use the Gym visual GIFs from hasaneyldrm/exercises-dataset, and don't trace or AI-generate from them. Their terms make the free versions "entirely copyrighted" and licenses non-transferable. Plan instead: own animations (film → MediaPipe pose → SVG stick figures, ~30–60 per movement pattern) plus YouTube links (kinetic-place/exercises-db has 906/908 linked; quality varies, hand-check).
+- **Language:** Brazilian Portuguese and English, switchable in Settings (defaults to the phone's language). All text goes through `src/i18n/`; never hard-code UI text in components.
+- **No fixed weekdays:** workouts rotate (A, B, C…) and are done on whichever days suit the user; the app suggests the next one and tracks training days on a calendar.
 - Preferred route to Android: **Capacitor** (reuse ~95% of the code). Approved and built.
 
 ## How the algorithm works (short)
@@ -63,6 +68,19 @@ React 19.3.1 · TypeScript 7.0.2 (strict, `noUncheckedIndexedAccess`) · Vite 8.
 
 Time model, caps and weights live in `LIMITS` at the top of `generator.ts`.
 
+## Workout rotation
+
+`src/lib/rotation.ts`: the next workout is the one after the most recent session (by date, then `savedAt`) logged under the current plan; empty workouts are skipped. The Workout screen opens on today's logged workout if there is one, otherwise the next one. The Plan screen shows this Monday-to-Sunday week (trained days, "X of N workouts", "Up next"); History has a month calendar (tap a day to open that workout).
+
+## Languages (i18n)
+
+- `src/i18n/en.ts` is the source; `pt.ts` is typed `Dict = typeof en`, so a missing or mistyped key fails the build. Components use `useI18n()` (`t`, `exName`, `date`, `num`, `text`).
+- The plan logic never writes sentences. Reasons, notices and warnings are `Msg` objects (`src/lib/types.ts`), swap reasons are `SwapReason`, cues are `Cue`; the dictionaries phrase them. So a saved plan follows a language switch.
+- Plans saved before this (no `v: 2`) are migrated on load by `migratePlan`: weekdays and English day names dropped, warnings recomputed. Their old reasons and notices stay as English strings (`Text = string | Msg`) until the plan is rebuilt.
+- Exercise translations: `src/data/exercises.pt.json` (`{ id: { name, note?, instructions } }`), falls back to English. Not generated by `build:data`; keep it in sync by hand when the overlay changes (a test checks every exercise has a name and the same number of steps).
+- Translation choices: inches/feet converted to cm; the original's "knees must not pass the toes" rule is attributed to the original text instead of stated as fact (current evidence doesn't support it as a universal rule); references to a "foot positioning section" that doesn't exist in the app were dropped.
+- The AI review sends labels and exercise names in the user's language and asks for a reply in it (`t.review.replyIn`).
+
 ## Data pipeline
 
 `data/overlay.ts` (126 hand-tagged exercises: pattern, muscle weights, equipment with `a|b` alternatives, skill, joint stress 1–3, painful-movement tags, staple flag) + `data/vendor/free-exercise-db.json` → `npm run build:data` (`scripts/build-data.ts`, run directly by Node's type stripping) → `src/data/exercises.json`. The script fails on unknown ids or tags.
@@ -77,11 +95,11 @@ Time model, caps and weights live in `LIMITS` at the top of `generator.ts`.
 - AI review findings can only be marked done/ignored; suggestions are not applied automatically (by design — use Swap).
 - No "starting weight" estimate for swapped exercises yet (design doc mentions it as a labelled guess).
 - No curated YouTube ids yet; the exercise dialog links to a YouTube search.
-- Main bundle is ~429 KB (includes the 140 KB exercise JSON); the SDK is a separate 352 KB chunk loaded only on review.
+- Main bundle is ~565 KB (includes the 140 KB exercise JSON and ~110 KB of Portuguese exercise text; Vite warns about the 500 KB limit). Could lazy-load the language not in use if it matters; the app is precached for offline anyway. The SDK is a separate 352 KB chunk loaded only on review.
 
 ## Next steps (suggested order)
 
-1. Merge `android-app` once it has run on a phone.
+1. Merge `rotation-and-pt` (which contains `android-app`) once it has run on a phone.
 2. Browser pass over all screens (see "Not verified"), fix what breaks.
 3. Real API test of the AI review.
 4. Android (see "Android app" below): install the APK on a phone (or free disk / shrink the AVD's storage and use the emulator), and check everything in "Android: not verified".
