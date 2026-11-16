@@ -10,7 +10,7 @@ import { dayLetter, nextDayIdx } from "../../lib/rotation.ts";
 import { store } from "../../lib/storage.ts";
 import { applySwap } from "../../lib/swap.ts";
 import type { Plan, WorkoutDraft } from "../../lib/types.ts";
-import { buildWorkout, sessionId, workoutToSession } from "../../lib/workout.ts";
+import { buildWorkout, prefillSets, sessionId, workoutToSession } from "../../lib/workout.ts";
 import { AskClaudeButton } from "../common/AskClaudeButton.tsx";
 import { Button } from "../common/Button.tsx";
 import { Callout } from "../common/Callout.tsx";
@@ -128,7 +128,16 @@ export function WorkoutView({ plan }: { plan: Plan }) {
             date={workout.date}
             unit={workout.unit}
             history={historyFor(others, entry.exId)}
-            onChange={(sets) => edit((w) => ({ ...w, entries: w.entries.map((e, k) => (k === i ? { ...e, sets } : e)) }))}
+            onChange={(sets) => edit((w) => ({ ...w, entries: w.entries.map((e, k) => (k === i ? { ...e, sets, untouched: undefined } : e)) }))}
+            onState={(state) => edit((w) => ({
+              ...w,
+              entries: w.entries.map((e, k) => {
+                if (k !== i) return e;
+                // Done confirms the values shown, pre-filled or not.
+                if (state === "done") return { ...e, state, untouched: undefined };
+                return state ? { ...e, state } : { ...e, state: undefined };
+              }),
+            }))}
             onInfo={() => setInfoId(entry.exId)}
             onSwap={() => setSwap({ entryIdx: i, mode: "today", dayIdx: sel.dayIdx, slot: entry.slot })}
           />
@@ -146,6 +155,7 @@ export function WorkoutView({ plan }: { plan: Plan }) {
         <Button onClick={save}>{workout.saved ? t.workout.update : t.workout.save}</Button>
         <span className={error ? styles.error : styles.status} role={error ? "alert" : undefined}>{status}</span>
       </div>
+      <p className={styles.status}>{t.workout.saveHint}</p>
 
       {infoId && <ExerciseInfoDialog exId={infoId} onClose={() => setInfoId(null)} />}
       {swap && (
@@ -157,7 +167,14 @@ export function WorkoutView({ plan }: { plan: Plan }) {
           onClose={() => setSwap(null)}
           onPick={(exId, scope) => {
             if (swap.mode === "today") {
-              edit((w) => ({ ...w, entries: w.entries.map((e, k) => (k === swap.entryIdx ? { ...e, exId, sets: e.sets.map(() => ({ w: null, r: null, hurt: false })) } : e)) }));
+              edit((w) => ({
+                ...w,
+                entries: w.entries.map((e, k) => {
+                  if (k !== swap.entryIdx) return e;
+                  const { sets, prefilled } = prefillSets(exId, e.sets.length, w.date, others, w.unit);
+                  return { ...e, exId, sets, state: undefined, untouched: prefilled || undefined };
+                }),
+              }));
             } else {
               updatePlan(applySwap(plan, swap.dayIdx, swap.slot, exId, EXERCISES, scope));
               setHurt(null);

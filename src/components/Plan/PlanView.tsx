@@ -5,6 +5,7 @@ import { useI18n } from "../../hooks/useI18n.ts";
 import { useToast } from "../../hooks/useToast.tsx";
 import { isoDate } from "../../lib/format.ts";
 import { nextDayIdx } from "../../lib/rotation.ts";
+import { setsThisWeek } from "../../lib/volume.ts";
 import { applySwap } from "../../lib/swap.ts";
 import type { Plan } from "../../lib/types.ts";
 import { AskClaudeButton } from "../common/AskClaudeButton.tsx";
@@ -63,7 +64,7 @@ export function PlanView({ plan }: { plan: Plan }) {
         </div>
         <aside className={styles.stack}>
           <Panel label={t.plan.weeklySets}>
-            <VolumeChart plan={plan} />
+            <VolumeChart plan={plan} done={setsThisWeek(sessions, EXERCISES)} />
             <p className={styles.note}>{t.plan.weeklyNote}</p>
           </Panel>
           <Panel label={t.ask.panel}>

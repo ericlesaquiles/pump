@@ -76,10 +76,11 @@ export function buildAskText(plan: Plan, sessions: Session[], exercises: Exercis
       lines.push("", `## ${a.workout(t.workoutFull(w.dayIdx, day.key), date(w.date))}`);
       for (const e of w.entries) {
         const slot = day.exercises[e.slot];
-        const done = e.sets.filter((s) => (s.r ?? 0) > 0);
+        // Pre-filled values nobody confirmed aren't what was done today.
+        const done = e.state === "skipped" || e.untouched ? [] : e.sets.filter((s) => (s.r ?? 0) > 0);
         const planned = slot ? ` (${a.planned} ${slot.sets}×${slot.reps[0]}–${slot.reps[1]})` : "";
         const swapped = e.exId !== e.plannedExId ? ` ${a.insteadOf(name(e.plannedExId))}` : "";
-        const sets = done.length ? `${fmtSets(done, t.locale)} ${w.unit}` : a.notLogged;
+        const sets = e.state === "skipped" ? a.skipped : done.length ? `${fmtSets(done, t.locale)} ${w.unit}` : a.notLogged;
         const hurt = done.some((s) => s.hurt) ? ` ${a.hurtMark}` : "";
         lines.push(`- ${name(e.exId)}${swapped}${planned}: ${sets}${hurt}`);
       }

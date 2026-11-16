@@ -20,3 +20,35 @@
 }
 .muted { color: var(--muted); }
 .sets { display: grid; gap: 6px; }
+.foot {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+.prefilled { font-size: 0.8rem; color: var(--muted); }
+.doneBtn { color: var(--good); border-color: var(--good); }
+.skipBtn { color: var(--warn); border-color: var(--warn); }
+
+/* Closed card: only the name, green when done, yellow when skipped. Tap to reopen. */
+.closed { padding: 0; }
+.doneCard { border-color: var(--good); background: var(--good-bg); }
+.skippedCard { border-color: var(--warn); background: var(--warn-bg); }
+.reopen {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  width: 100%;
+  padding: 12px 14px;
+  background: none;
+  border: 0;
+  text-align: left;
+}
+.doneName,
+.skippedName { font-weight: 700; }
+.doneName { color: var(--good); }
+.skippedName { color: var(--warn); }
+.closedMeta { font-size: 0.82rem; color: var(--muted); font-variant-numeric: tabular-nums; }

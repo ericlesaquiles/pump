@@ -28,11 +28,12 @@ test("exercise context: profile, plan, recent sets and pain marks, in Portuguese
 
 test("workout context includes unsaved sets and notes; plan context works in English", () => {
   const w = buildWorkout(plan, 0, "2026-11-15", sessions, "kg");
-  w.entries[0]!.sets[0] = { w: 65, r: 8, hurt: false };
+  // As the Workout screen does: editing a set clears the "pre-filled, untouched" flag.
+  w.entries[0] = { ...w.entries[0]!, sets: [{ w: 65, r: 8, hurt: false }, ...w.entries[0]!.sets.slice(1)], untouched: undefined };
   w.note = "Slept badly";
   const text = buildAskText(plan, sessions, db, "en", { kind: "workout", workout: w }, today);
   assert.match(text, /The workout I'm asking about: Workout A · Upper/);
-  assert.match(text, /65×8 kg/);
+  assert.match(text, /65×8, 65×6 kg/, "edited first set plus last time's second set");
   assert.match(text, /not logged/);
   assert.match(text, /My notes: Slept badly/);
   const planText = buildAskText(plan, [], db, "en", { kind: "plan" }, today);

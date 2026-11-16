@@ -160,6 +160,21 @@ export interface SessionEntry {
   plannedExId: string;
   exId: string;
   sets: { w: number; r: number; hurt: boolean }[];
+  /** Marked "Done" in the workout. */
+  done?: boolean;
+}
+
+/** An exercise in a workout: open, finished ("Done") or skipped for this workout only. */
+export type EntryState = "done" | "skipped";
+
+export interface DraftEntry {
+  slot: number;
+  plannedExId: string;
+  exId: string;
+  sets: LoggedSet[];
+  state?: EntryState;
+  /** Values were pre-filled from last time and not edited since: not saved unless marked Done. */
+  untouched?: boolean;
 }
 
 export interface Session {
@@ -172,6 +187,8 @@ export interface Session {
   dayName?: string;
   unit: Unit;
   entries: SessionEntry[];
+  /** Slots skipped in this workout. */
+  skipped?: number[];
   note: string;
   savedAt: string;
 }
@@ -183,7 +200,7 @@ export interface WorkoutDraft {
   date: string;
   dayIdx: number;
   unit: Unit;
-  entries: { slot: number; plannedExId: string; exId: string; sets: LoggedSet[] }[];
+  entries: DraftEntry[];
   note: string;
   saved: boolean;
 }

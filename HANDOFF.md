@@ -81,6 +81,13 @@ Time model, caps and weights live in `LIMITS` at the top of `generator.ts`.
 - Translation choices: inches/feet converted to cm; the original's "knees must not pass the toes" rule is attributed to the original text instead of stated as fact (current evidence doesn't support it as a universal rule); references to a "foot positioning section" that doesn't exist in the app were dropped.
 - The AI review sends labels and exercise names in the user's language and asks for a reply in it (`t.review.replyIn`).
 
+## Workout logging rules (2026-11-15)
+
+- **Pre-fill:** a new workout's sets are filled with the values logged the last time that exercise was done (set by set; weight only if the unit matches; empty if never done). Such an entry is flagged `untouched` until edited.
+- **Skip / Done per exercise:** `DraftEntry.state` is `"skipped"` or `"done"`; a closed card shows only the name (yellow / green), tap to reopen. Saved as `Session.skipped` (slots) and `SessionEntry.done`.
+- **What Save records:** entries marked Done, or edited; never skipped ones or untouched pre-filled ones (otherwise last time's numbers would be logged for exercises not done). `src/lib/workout.ts`, tested in `test/workout.test.ts`.
+- **Weekly chart:** green bar/number = sets in *saved* sessions this Monday-to-Sunday week (`src/lib/volume.ts`, counted like the plan); pale bar = planned sets. Unsaved drafts don't count.
+
 ## Ask Claude (share to the Claude app)
 
 The user wanted to use their Claude subscription with Pump. A subscription can't be connected to a third-party app (apps use the API with a key), so Pump hands text to the Claude app instead: `src/lib/ask.ts` builds a short context (profile, plan, and the focused exercise's recent sets and next-step cue, or the current workout including unsaved sets and notes) in the user's language, and `shareText` in `src/lib/native.ts` opens the Android share sheet (browser: `navigator.share`, else clipboard). Buttons: exercise dialog, Workout screen, a panel on the Plan screen. Pump itself sends nothing. Option 2 discussed but not built: an in-app chat using the user's API key (paid separately), which could also apply suggested swaps.

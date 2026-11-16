@@ -2,14 +2,18 @@
 .chart { width: 100%; height: auto; display: block; }
 .label { fill: var(--ink); font-size: 12px; }
 .value { fill: var(--muted); font-size: 12px; font-variant-numeric: tabular-nums; }
+.doneText { fill: var(--good); font-weight: 700; }
 .track { fill: var(--sunken); stroke: var(--line); }
-.fill { fill: var(--accent); }
-.fillLow { fill: var(--danger); }
+/* The plan's sets are pale so this week's logged sets (green) stand out on top. */
+.fill { fill: var(--accent); opacity: 0.35; }
+.fillLow { fill: var(--danger); opacity: 0.45; }
+.done { fill: var(--good); }
 .target { stroke: var(--ink); stroke-width: 2; }
 .floor { stroke: var(--muted); stroke-width: 2; opacity: 0.6; }
 
 .legend { display: flex; gap: 12px; flex-wrap: wrap; font-size: 0.78rem; color: var(--muted); }
 .legend i { display: inline-block; height: 10px; border-radius: 2px; vertical-align: -1px; margin-right: 4px; }
-.keyFill { width: 10px; background: var(--accent); }
+.keyDone { width: 10px; background: var(--good); }
+.keyFill { width: 10px; background: var(--accent); opacity: 0.35; }
 .keyTarget { width: 2px; background: var(--ink); }
 .keyFloor { width: 2px; background: var(--muted); }
