@@ -1,3 +1,4 @@
+import { useId, useState } from "react";
 import { EXERCISE_BY_ID } from "../../data/exercises.ts";
 import { useI18n } from "../../hooks/useI18n.ts";
 import { useRestTimer } from "../../hooks/useRestTimer.tsx";
@@ -6,6 +7,7 @@ import { cue, type HistoryPoint } from "../../lib/progression.ts";
 import type { DraftEntry, EntryState, LoggedSet, PlanExercise, WorkoutDraft } from "../../lib/types.ts";
 import { Button } from "../common/Button.tsx";
 import { Chip, type ChipTone } from "../common/Chip.tsx";
+import { ExerciseDetails } from "../Exercise/ExerciseDetails.tsx";
 import { SetRow } from "./SetRow.tsx";
 import styles from "./ExerciseLog.module.css";
 
@@ -21,12 +23,13 @@ interface Props {
   onChange: (sets: LoggedSet[]) => void;
   /** Done or skipped closes the card; null reopens it. */
   onState: (state: EntryState | null) => void;
-  onInfo: () => void;
   onSwap: () => void;
 }
 
-export function ExerciseLog({ entry, slot, date, unit, history, onChange, onState, onInfo, onSwap }: Props) {
+export function ExerciseLog({ entry, slot, date, unit, history, onChange, onState, onSwap }: Props) {
   const timer = useRestTimer();
+  const [details, setDetails] = useState(false);
+  const detailsId = useId();
   const { t, exName, date: fmtDate } = useI18n();
   const ex = EXERCISE_BY_ID.get(entry.exId);
   if (!ex) return null;
@@ -56,7 +59,7 @@ export function ExerciseLog({ entry, slot, date, unit, history, onChange, onStat
     <article className={styles.card}>
       <div className={styles.head}>
         <div>
-          <Button variant="link" onClick={onInfo}><h3>{name}</h3></Button>
+          <Button variant="link" onClick={() => setDetails((d) => !d)} aria-expanded={details} aria-controls={detailsId}><h3>{name}</h3></Button>
           <div className={styles.rx}>
             {slot.sets} × {slot.reps[0]}–{slot.reps[1]} · {t.rir[slot.rir] ?? t.rir.compound}
             {swapped && <> · <Chip>{t.workout.insteadOf(exName(entry.plannedExId))}</Chip></>}
@@ -65,8 +68,16 @@ export function ExerciseLog({ entry, slot, date, unit, history, onChange, onStat
         <div className={styles.tools}>
           <Button variant="ghost" small onClick={() => timer.start(slot.rest)}>{t.workout.rest(fmtRest(slot.rest))}</Button>
           <Button variant="ghost" small onClick={onSwap}>{t.workout.swap}</Button>
+          <Button variant="ghost" small onClick={() => setDetails((d) => !d)} aria-expanded={details} aria-controls={detailsId}>
+            {t.workout.details} <span className={cx(styles.chevron, details && styles.open)} aria-hidden="true">▾</span>
+          </Button>
         </div>
       </div>
+      {details && (
+        <div id={detailsId} className={styles.details}>
+          <ExerciseDetails exId={entry.exId} showSummary />
+        </div>
+      )}
       <div className={styles.meta}>
         <span className={styles.muted}>{last ? t.workout.last(fmtDate(last.date), fmtSets(last.sets, t.locale)) : t.workout.noPrevious}</span>
         <Chip tone={CUE_TONE[next.kind]}>{t.workout.cue(next.kind, next)}</Chip>

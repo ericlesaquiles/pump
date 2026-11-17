@@ -52,3 +52,12 @@
 .doneName { color: var(--good); }
 .skippedName { color: var(--warn); }
 .closedMeta { font-size: 0.82rem; color: var(--muted); font-variant-numeric: tabular-nums; }
+
+/* Exercise details (animation, muscles, how to do it) opened inside the card. */
+.details {
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding: 12px 0;
+}
+.chevron { display: inline-block; transition: transform 0.15s; }
+.open { transform: rotate(180deg); }

@@ -1,3 +1,4 @@
+.details { display: grid; gap: 12px; min-width: 0; }
 .kv {
   display: grid;
   grid-template-columns: max-content minmax(0, 1fr);

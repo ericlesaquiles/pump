@@ -15,7 +15,6 @@ import { AskClaudeButton } from "../common/AskClaudeButton.tsx";
 import { Button } from "../common/Button.tsx";
 import { Callout } from "../common/Callout.tsx";
 import { PageHeader } from "../common/PageHeader.tsx";
-import { ExerciseInfoDialog } from "../Exercise/ExerciseInfoDialog.tsx";
 import { SwapDialog } from "../Exercise/SwapDialog.tsx";
 import { ExerciseLog } from "./ExerciseLog.tsx";
 import { HurtCallout, type HurtInfo } from "./HurtCallout.tsx";
@@ -39,7 +38,6 @@ export function WorkoutView({ plan }: { plan: Plan }) {
   const [dirty, setDirty] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [hurt, setHurt] = useState<HurtInfo | null>(null);
-  const [infoId, setInfoId] = useState<string | null>(null);
   const [swap, setSwap] = useState<{ entryIdx: number; mode: "today" | "plan"; dayIdx: number; slot: number } | null>(null);
   const workout = state.workout;
 
@@ -138,7 +136,6 @@ export function WorkoutView({ plan }: { plan: Plan }) {
                 return state ? { ...e, state } : { ...e, state: undefined };
               }),
             }))}
-            onInfo={() => setInfoId(entry.exId)}
             onSwap={() => setSwap({ entryIdx: i, mode: "today", dayIdx: sel.dayIdx, slot: entry.slot })}
           />
         );
@@ -157,7 +154,6 @@ export function WorkoutView({ plan }: { plan: Plan }) {
       </div>
       <p className={styles.status}>{t.workout.saveHint}</p>
 
-      {infoId && <ExerciseInfoDialog exId={infoId} onClose={() => setInfoId(null)} />}
       {swap && (
         <SwapDialog
           plan={plan}

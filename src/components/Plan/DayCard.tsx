@@ -1,4 +1,6 @@
+import { useState } from "react";
 import { useI18n } from "../../hooks/useI18n.ts";
+import { cx } from "../../lib/format.ts";
 import { dayLetter } from "../../lib/rotation.ts";
 import type { PlanDay } from "../../lib/types.ts";
 import { Button } from "../common/Button.tsx";
@@ -20,6 +22,9 @@ interface Props {
 export function DayCard({ day, dayIdx, isNext, onStart, onInfo, onSwap }: Props) {
   const { t } = useI18n();
   const headingId = `day-${dayIdx}`;
+  const listId = `day-${dayIdx}-list`;
+  // Exercise lists start collapsed so the plan fits on a phone screen.
+  const [open, setOpen] = useState(false);
   const active = day.exercises.map((item, exIdx) => ({ item, exIdx })).filter(({ item }) => item.sets > 0);
   return (
     <section className={styles.card} aria-labelledby={headingId}>
@@ -36,8 +41,14 @@ export function DayCard({ day, dayIdx, isNext, onStart, onInfo, onSwap }: Props)
         </div>
         <Button small onClick={onStart}>{t.plan.startWorkout(dayLetter(dayIdx))}</Button>
       </div>
+      {active.length > 0 && (
+        <button type="button" className={styles.toggle} onClick={() => setOpen((o) => !o)} aria-expanded={open} aria-controls={listId}>
+          <span className={cx(styles.chevron, open && styles.open)} aria-hidden="true">▸</span>
+          {open ? t.plan.hideExercises : t.plan.showExercises(active.length)}
+        </button>
+      )}
       {active.length ? (
-        <ul className={styles.list}>
+        open && <ul id={listId} className={styles.list}>
           {active.map(({ item, exIdx }) => (
             <ExerciseRow key={`${exIdx}-${item.exId}`} item={item} onInfo={onInfo} onSwap={() => onSwap(exIdx)} />
           ))}
