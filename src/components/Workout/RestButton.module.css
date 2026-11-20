@@ -1,0 +1,53 @@
+/* Rest timer button: idle shows the rest time; running shows a countdown and a bar. */
+.btn {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  min-width: 8.5rem;
+  padding: 6px 12px 8px;
+  border: 1px solid var(--line);
+  border-radius: var(--r-sm);
+  background: var(--surface);
+  font-size: 0.85rem;
+  font-weight: 600;
+  overflow: hidden;
+}
+.icon { font-size: 0.7rem; color: var(--accent); }
+.text { font-variant-numeric: tabular-nums; }
+.running { border-color: var(--accent); background: var(--sunken); }
+.running .text { font-family: var(--f-display); font-size: 1.15rem; line-height: 1; }
+.done { border-color: var(--good); background: var(--good-bg); color: var(--good); }
+.done .icon { color: var(--good); }
+.done .text { font-family: inherit; font-size: 0.85rem; }
+.bar {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: var(--line);
+}
+.fill { display: block; height: 100%; background: var(--accent); transition: width 0.25s linear; }
+.done .fill { background: var(--good); }
+.fill[data-p="0"] { width: 0%; }
+.fill[data-p="1"] { width: 5%; }
+.fill[data-p="2"] { width: 10%; }
+.fill[data-p="3"] { width: 15%; }
+.fill[data-p="4"] { width: 20%; }
+.fill[data-p="5"] { width: 25%; }
+.fill[data-p="6"] { width: 30%; }
+.fill[data-p="7"] { width: 35%; }
+.fill[data-p="8"] { width: 40%; }
+.fill[data-p="9"] { width: 45%; }
+.fill[data-p="10"] { width: 50%; }
+.fill[data-p="11"] { width: 55%; }
+.fill[data-p="12"] { width: 60%; }
+.fill[data-p="13"] { width: 65%; }
+.fill[data-p="14"] { width: 70%; }
+.fill[data-p="15"] { width: 75%; }
+.fill[data-p="16"] { width: 80%; }
+.fill[data-p="17"] { width: 85%; }
+.fill[data-p="18"] { width: 90%; }
+.fill[data-p="19"] { width: 95%; }
+.fill[data-p="20"] { width: 100%; }

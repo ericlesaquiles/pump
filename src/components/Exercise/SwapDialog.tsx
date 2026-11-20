@@ -7,6 +7,7 @@ import { Button } from "../common/Button.tsx";
 import { Callout } from "../common/Callout.tsx";
 import { Dialog } from "../common/Dialog.tsx";
 import { OptionGroup } from "../common/OptionGroup.tsx";
+import { ExerciseDetails, useExerciseSummary } from "./ExerciseDetails.tsx";
 import styles from "./SwapDialog.module.css";
 
 interface Props {
@@ -29,12 +30,36 @@ export function SwapDialog({ plan, dayIdx, exIdx, mode, onPick, onClose }: Props
     [plan, dayIdx, exIdx, filter],
   );
   const [picked, setPicked] = useState<string | null>(null);
+  // An option whose details are being looked at (replaces the list until "Back").
+  const [preview, setPreview] = useState<string | null>(null);
+  const previewSummary = useExerciseSummary(preview ?? "");
   const selected = picked && candidates.some((c) => c.ex.id === picked) ? picked : candidates[0]?.ex.id ?? null;
   const impact = useMemo(() => (mode === "plan" && selected ? swapImpact(plan, dayIdx, exIdx, selected, EXERCISES) : []), [mode, selected, plan, dayIdx, exIdx]);
 
   if (!slot) return null;
   const currentName = exName(slot.exId);
   const warn = impact.filter((c) => c.belowFloor);
+  const previewed = preview ? candidates.find((c) => c.ex.id === preview) : undefined;
+
+  if (previewed) {
+    return (
+      <Dialog
+        eyebrow={`${t.swap.previewEyebrow(currentName)} · ${previewSummary}`}
+        title={exName(previewed.ex.id)}
+        closeLabel={t.cancel}
+        onClose={onClose}
+        footer={
+          <>
+            <Button variant="ghost" onClick={() => setPreview(null)}>{t.swap.back}</Button>
+            <Button onClick={() => { setPicked(previewed.ex.id); setPreview(null); }}>{t.swap.choose}</Button>
+          </>
+        }
+      >
+        <p className={styles.muted}>{t.swap.reason(previewed.reason)}</p>
+        <ExerciseDetails exId={previewed.ex.id} />
+      </Dialog>
+    );
+  }
 
   return (
     <Dialog
@@ -56,11 +81,16 @@ export function SwapDialog({ plan, dayIdx, exIdx, mode, onPick, onClose }: Props
         {candidates.map((c, i) => (
           <div key={c.ex.id} className={styles.group}>
             {(i === 0 || candidates[i - 1]?.tier !== c.tier) && <div className={styles.tier}>{t.swap.tiers[c.tier]}</div>}
-            <label className={styles.cand}>
-              <input type="radio" name="swap-candidate" checked={selected === c.ex.id} onChange={() => setPicked(c.ex.id)} />
-              <strong>{exName(c.ex.id)}</strong>
-              <small>{t.swap.reason(c.reason)}</small>
-            </label>
+            <div className={styles.row}>
+              <label className={styles.cand}>
+                <input type="radio" name="swap-candidate" checked={selected === c.ex.id} onChange={() => setPicked(c.ex.id)} />
+                <strong>{exName(c.ex.id)}</strong>
+                <small>{t.swap.reason(c.reason)}</small>
+              </label>
+              <Button variant="link" small className={styles.more} onClick={() => setPreview(c.ex.id)} aria-label={t.swap.detailsOf(exName(c.ex.id))}>
+                {t.swap.details}
+              </Button>
+            </div>
           </div>
         ))}
       </div>

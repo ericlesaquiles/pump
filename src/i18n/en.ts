@@ -239,6 +239,11 @@ export const en = {
     scopePlan: "Rest of the plan",
     scopeNever: (name: string) => `Never suggest ${name} again`,
     todayNote: "Your plan stays the same. The log records what you actually did.",
+    details: "See details",
+    detailsOf: (name: string) => `See details of ${name}`,
+    previewEyebrow: (current: string) => `Option instead of ${current}`,
+    back: "◂ Back to the list",
+    choose: "Choose this one",
     reason: (r: SwapReason): string => {
       const equip = (e: EquipmentNeed) => e.kind === "none" ? "needs no equipment" : e.kind === "bench" ? "uses a bench" : `uses ${or(e.items.map((x) => EQUIP_WORDS[x]))}`;
       const parts = [
@@ -295,6 +300,8 @@ export const en = {
     addLimitation: "Add a limitation",
     dismiss: "Dismiss",
     restLabel: "Rest",
+    startRest: (time: string) => `Start rest timer, ${time}`,
+    stopRest: (left: string) => `Stop rest timer, ${left} left`,
     restOver: "Rest over",
     timerDone: "Done",
     notifTitle: "Rest over",

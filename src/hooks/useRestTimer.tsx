@@ -1,50 +1,83 @@
-import { createContext, useCallback, useContext, useEffect, useState, type ReactNode } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react";
 import { RestTimer } from "../components/Workout/RestTimer.tsx";
 import { buzz, cancelRestEnd, scheduleRestEnd } from "../lib/native.ts";
 import { useI18n } from "./useI18n.ts";
 
-interface TimerApi { start: (seconds: number) => void }
-const Ctx = createContext<TimerApi>({ start: () => {} });
+interface TimerActions {
+  /** Start (or restart) a countdown. `key` says which exercise started it, so its button can show it. */
+  start: (seconds: number, key?: string) => void;
+  stop: () => void;
+}
 
-/** One floating rest timer for the whole app. */
+export interface TimerState {
+  key: string | null;
+  /** Seconds left (0 when finished). */
+  left: number;
+  /** Length of the current countdown, for progress bars. */
+  total: number;
+  running: boolean;
+  done: boolean;
+}
+
+const IDLE: TimerState = { key: null, left: 0, total: 0, running: false, done: false };
+const Actions = createContext<TimerActions>({ start: () => {}, stop: () => {} });
+// Separate context so only the timer displays re-render every tick, not whole screens.
+const State = createContext<TimerState>(IDLE);
+
+/** One rest timer for the whole app: shown on the exercise that started it and as a floating pill. */
 export function RestTimerProvider({ children }: { children: ReactNode }) {
   const { t } = useI18n();
-  const [end, setEnd] = useState<number | null>(null);
+  const [run, setRun] = useState<{ end: number; total: number; key: string | null } | null>(null);
   const [now, setNow] = useState(() => Date.now());
 
   useEffect(() => {
-    if (end === null) return;
+    if (!run) return;
     const id = window.setInterval(() => setNow(Date.now()), 250);
     return () => window.clearInterval(id);
-  }, [end]);
+  }, [run]);
 
-  const left = end === null ? 0 : Math.max(0, Math.round((end - now) / 1000));
-  const done = end !== null && left === 0;
+  const left = run ? Math.max(0, Math.ceil((run.end - now) / 1000)) : 0;
+  const done = run !== null && left === 0;
 
   useEffect(() => {
     if (done) void buzz();
   }, [done]);
 
-  const start = useCallback((seconds: number) => {
-    setNow(Date.now());
-    setEnd(Date.now() + seconds * 1000);
+  const start = useCallback((seconds: number, key?: string) => {
+    const at = Date.now();
+    setNow(at);
+    setRun({ end: at + seconds * 1000, total: seconds, key: key ?? null });
     // On Android, also notify when rest ends in case the phone is locked.
     void scheduleRestEnd(seconds, { title: t.workout.notifTitle, body: t.workout.notifBody });
   }, [t]);
 
   const stop = useCallback(() => {
-    setEnd(null);
+    setRun(null);
     void cancelRestEnd();
   }, []);
 
+  const actions = useMemo(() => ({ start, stop }), [start, stop]);
+  const state = useMemo<TimerState>(
+    () => (run ? { key: run.key, left, total: run.total, running: !done, done } : IDLE),
+    [run, left, done],
+  );
+
   return (
-    <Ctx.Provider value={{ start }}>
-      {children}
-      {end !== null && (
-        <RestTimer seconds={left} done={done} onAdd={() => start(left + 30)} onStop={stop} />
-      )}
-    </Ctx.Provider>
+    <Actions.Provider value={actions}>
+      <State.Provider value={state}>
+        {children}
+        {run && (
+          <RestTimer
+            seconds={left}
+            done={done}
+            onAdd={() => setRun((r) => (r ? { ...r, end: Math.max(r.end, Date.now()) + 30_000, total: r.total + 30 } : r))}
+            onStop={stop}
+          />
+        )}
+      </State.Provider>
+    </Actions.Provider>
   );
 }
 
-export const useRestTimer = () => useContext(Ctx);
+export const useRestTimer = () => useContext(Actions);
+export const useRestTimerState = () => useContext(State);

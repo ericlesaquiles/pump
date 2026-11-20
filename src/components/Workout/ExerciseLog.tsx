@@ -1,13 +1,13 @@
 import { useId, useState } from "react";
 import { EXERCISE_BY_ID } from "../../data/exercises.ts";
 import { useI18n } from "../../hooks/useI18n.ts";
-import { useRestTimer } from "../../hooks/useRestTimer.tsx";
-import { cx, fmtRest, fmtSets } from "../../lib/format.ts";
+import { cx, fmtSets } from "../../lib/format.ts";
 import { cue, type HistoryPoint } from "../../lib/progression.ts";
 import type { DraftEntry, EntryState, LoggedSet, PlanExercise, WorkoutDraft } from "../../lib/types.ts";
 import { Button } from "../common/Button.tsx";
 import { Chip, type ChipTone } from "../common/Chip.tsx";
 import { ExerciseDetails } from "../Exercise/ExerciseDetails.tsx";
+import { RestButton } from "./RestButton.tsx";
 import { SetRow } from "./SetRow.tsx";
 import styles from "./ExerciseLog.module.css";
 
@@ -27,7 +27,6 @@ interface Props {
 }
 
 export function ExerciseLog({ entry, slot, date, unit, history, onChange, onState, onSwap }: Props) {
-  const timer = useRestTimer();
   const [details, setDetails] = useState(false);
   const detailsId = useId();
   const { t, exName, date: fmtDate } = useI18n();
@@ -66,7 +65,7 @@ export function ExerciseLog({ entry, slot, date, unit, history, onChange, onStat
           </div>
         </div>
         <div className={styles.tools}>
-          <Button variant="ghost" small onClick={() => timer.start(slot.rest)}>{t.workout.rest(fmtRest(slot.rest))}</Button>
+          <RestButton seconds={slot.rest} timerKey={`${date}:${entry.slot}`} />
           <Button variant="ghost" small onClick={onSwap}>{t.workout.swap}</Button>
           <Button variant="ghost" small onClick={() => setDetails((d) => !d)} aria-expanded={details} aria-controls={detailsId}>
             {t.workout.details} <span className={cx(styles.chevron, details && styles.open)} aria-hidden="true">▾</span>

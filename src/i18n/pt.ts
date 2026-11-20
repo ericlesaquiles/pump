@@ -323,6 +323,11 @@ export const pt: Dict = {
     scopePlan: "No resto do plano",
     scopeNever: (name: string) => `Nunca mais sugerir ${name}`,
     todayNote: "Seu plano continua igual. O registro guarda o que você realmente fez.",
+    details: "Ver detalhes",
+    detailsOf: (name: string) => `Ver detalhes de ${name}`,
+    previewEyebrow: (current: string) => `Opção no lugar de ${current}`,
+    back: "◂ Voltar à lista",
+    choose: "Escolher este",
     reason: (r: SwapReason): string => {
       const equip = (e: EquipmentNeed) => e.kind === "none" ? "sem equipamento" : e.kind === "bench" ? "usa banco" : `usa ${or(e.items.map((x) => EQUIP_WORDS[x]))}`;
       const parts = [
@@ -379,6 +384,8 @@ export const pt: Dict = {
     addLimitation: "Adicionar limitação",
     dismiss: "Dispensar",
     restLabel: "Descanso",
+    startRest: (time: string) => `Iniciar descanso de ${time}`,
+    stopRest: (left: string) => `Parar descanso, faltam ${left}`,
     restOver: "Fim do descanso",
     timerDone: "Pronto",
     notifTitle: "Fim do descanso",

@@ -23,3 +23,12 @@
 .cand small { color: var(--muted); }
 .impact { font-size: 0.88rem; }
 .muted { color: var(--muted); font-size: 0.88rem; }
+
+/* A candidate and its "See details" link side by side. */
+.row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 4px;
+}
+.more { white-space: nowrap; font-size: 0.82rem; }
