@@ -46,3 +46,13 @@ test("week and month helpers", () => {
   assert.deepEqual(nov[5], ["2026-11-30", null, null, null, null, null, null]);
   assert.equal(monthGrid(2026, 11).flat().filter(Boolean).length, 31, "December doesn't spill into January");
 });
+
+test("swiping moves along the top-bar tabs and stops at the ends", async () => {
+  const { neighbourTab } = await import("../src/hooks/useSwipeTabs.ts");
+  assert.equal(neighbourTab("plan", 1), "log");
+  assert.equal(neighbourTab("log", 1), "history");
+  assert.equal(neighbourTab("history", -1), "log");
+  assert.equal(neighbourTab("plan", -1), null);
+  assert.equal(neighbourTab("settings", 1), null);
+  assert.equal(neighbourTab("setup", 1), null, "the questionnaire isn't a tab");
+});

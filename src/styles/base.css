@@ -6,6 +6,10 @@
 html,
 body { margin: 0; }
 
+/* Sideways swipes switch tabs (useSwipeTabs), so the browser mustn't use them for back/forward. */
+html,
+body { overscroll-behavior-x: none; }
+
 body {
   background: var(--bg);
   color: var(--ink);
